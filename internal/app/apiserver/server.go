@@ -39,6 +39,7 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (s *server) configureRouter() {
 	s.router.HandleFunc("/users", s.handleUsersCreate()).Methods("POST")
 	s.router.HandleFunc("/sessions", s.handleSessionsCreate()).Methods("POST")
+	s.router.HandleFunc("/make", s.handleAdminUpdate()).Methods("POST")
 }
 
 func (s *server) handleUsersCreate() http.HandlerFunc {
@@ -84,7 +85,45 @@ func (s *server) handleSessionsCreate() http.HandlerFunc {
 			s.error(w, r, http.StatusUnauthorized, errorIncorrectEmailOrPassword)
 			return
 		}
-		s.respond(w, r, http.StatusOK, nil)
+		type resp struct {
+			IsAdmin string `json:"isAdmin"`
+		}
+		res := &resp{}
+		if u.Isadmin {
+			res.IsAdmin = "true"
+		} else {
+			res.IsAdmin = "false"
+		}
+
+		s.respond(w, r, http.StatusOK, res)
+	}
+}
+
+func (s *server) handleAdminUpdate() http.HandlerFunc {
+	type request struct {
+		Email string `json:"email"`
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := &request{}
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+		u, err := s.store.User().UpdateRoleAdmin(req.Email)
+		if err != nil {
+			s.error(w, r, http.StatusUnauthorized, errorIncorrectEmailOrPassword)
+			return
+		}
+		type resp struct {
+			IsAdmin string `json:"isAdmin"`
+		}
+		res := &resp{}
+		if u.Isadmin {
+			res.IsAdmin = "true"
+		} else {
+			res.IsAdmin = "false"
+		}
+		s.respond(w, r, http.StatusOK, res)
 	}
 }
 

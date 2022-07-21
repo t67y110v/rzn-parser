@@ -59,3 +59,30 @@ func (r *UserRepository) UpdateRoleAdmin(email string) (*model.User, error) {
 	u.Email = email
 	return u, nil
 }
+func (r *UserRepository) UpdateRoleManager(email string) (*model.User, error) {
+	u := &model.User{}
+	if err := r.store.db.QueryRow(
+		"UPDATE users SET isadmin = false WHERE email = $1 RETURNING id,isadmin",
+		email,
+	).Scan(
+		&u.ID,
+		&u.Isadmin,
+	); err != nil {
+		return nil, err
+	}
+	u.Email = email
+	return u, nil
+}
+
+func (r *UserRepository) ChangePassword(u *model.User) error {
+	if err := u.BeforeCreate(); err != nil {
+		return err
+	}
+	return r.store.db.QueryRow(
+		"UPDATE users SET encrypted_password = $1 WHERE email = $2 RETURNING ID",
+		u.EncryptedPassword,
+		u.Email,
+	).Scan(&u.ID)
+}
+
+//"$2a$04$Wfw9nXhI.4cM40JXvhw7CePo6BbrXaF8dTwRCWtDiHGYfbfIipDEa"

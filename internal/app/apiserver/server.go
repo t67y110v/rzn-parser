@@ -37,9 +37,12 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) configureRouter() {
+	//s.router.Host("{subdomain:[a-z]+}.example.com")
 	s.router.HandleFunc("/users", s.handleUsersCreate()).Methods("POST")
 	s.router.HandleFunc("/sessions", s.handleSessionsCreate()).Methods("POST")
-	s.router.HandleFunc("/make", s.handleAdminUpdate()).Methods("POST")
+	s.router.HandleFunc("/makeAdmin", s.handleAdminUpdate()).Methods("PUT")
+	s.router.HandleFunc("/makeManager", s.handleManagerUpdate()).Methods("PUT")
+	s.router.HandleFunc("/changePassword", s.handlePasswordChange()).Methods("PUT")
 }
 
 func (s *server) handleUsersCreate() http.HandlerFunc {
@@ -47,14 +50,12 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		req := &request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
-
 		u := &model.User{
 			Email:    req.Email,
 			Password: req.Password,
@@ -63,7 +64,6 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
 		}
-
 		u.Sanitize()
 		s.respond(w, r, http.StatusCreated, u)
 	}
@@ -94,7 +94,6 @@ func (s *server) handleSessionsCreate() http.HandlerFunc {
 		} else {
 			res.IsAdmin = "false"
 		}
-
 		s.respond(w, r, http.StatusOK, res)
 	}
 }
@@ -124,6 +123,58 @@ func (s *server) handleAdminUpdate() http.HandlerFunc {
 			res.IsAdmin = "false"
 		}
 		s.respond(w, r, http.StatusOK, res)
+	}
+}
+
+func (s *server) handleManagerUpdate() http.HandlerFunc {
+	type request struct {
+		Email string `json:"email"`
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := &request{}
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+		u, err := s.store.User().UpdateRoleManager(req.Email)
+		if err != nil {
+			s.error(w, r, http.StatusUnauthorized, errorIncorrectEmailOrPassword)
+			return
+		}
+		type resp struct {
+			IsAdmin string `json:"isAdmin"`
+		}
+		res := &resp{}
+		if u.Isadmin {
+			res.IsAdmin = "true"
+		} else {
+			res.IsAdmin = "false"
+		}
+		s.respond(w, r, http.StatusOK, res)
+	}
+}
+
+func (s *server) handlePasswordChange() http.HandlerFunc {
+	type request struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := &request{}
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+		u := &model.User{
+			Email:    req.Email,
+			Password: req.Password,
+		}
+		if err := s.store.User().ChangePassword(u); err != nil {
+			s.error(w, r, http.StatusUnprocessableEntity, err)
+			return
+		}
+		u.Sanitize()
+		s.respond(w, r, http.StatusOK, u)
 	}
 }
 

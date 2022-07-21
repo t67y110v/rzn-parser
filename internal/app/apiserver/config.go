@@ -6,7 +6,7 @@ type Config struct {
 	DatabaseURL string `toml:"database_url"`
 }
 
-// Deafult config values
+// Default config values
 func NewConfig() *Config {
 	return &Config{
 		BindAddr: ":8080",

@@ -1,4 +1,5 @@
-bind_addr = ":8080"
+bind_addr = ":8081"
 log_level = "debug"
 
 database_url = "user=postgres password=p02tgre2 dbname=restapi_test sslmode=disable"
+

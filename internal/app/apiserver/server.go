@@ -38,11 +38,11 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (s *server) configureRouter() {
 	//s.router.Host("{subdomain:[a-z]+}.example.com")
-	s.router.HandleFunc("/users", s.handleUsersCreate()).Methods("POST")
-	s.router.HandleFunc("/sessions", s.handleSessionsCreate()).Methods("POST")
-	s.router.HandleFunc("/makeAdmin", s.handleAdminUpdate()).Methods("PUT")
-	s.router.HandleFunc("/makeManager", s.handleManagerUpdate()).Methods("PUT")
-	s.router.HandleFunc("/changePassword", s.handlePasswordChange()).Methods("PUT")
+	s.router.HandleFunc("/users", s.handleUsersCreate()).Methods("POST")            //почта + пароль -> статус:201 json {"id":27,"email":"test3@gmail.com","isadmin":false}
+	s.router.HandleFunc("/sessions", s.handleSessionsCreate()).Methods("POST")      //почта + пароль -> статус:200 json {"isAdmin":"false"}
+	s.router.HandleFunc("/makeAdmin", s.handleAdminUpdate()).Methods("PUT")         //почта  -> статус:200 json {isAdmin:true}
+	s.router.HandleFunc("/makeManager", s.handleManagerUpdate()).Methods("PUT")     //почта  -> статус:200 json {isAdmin:false}
+	s.router.HandleFunc("/changePassword", s.handlePasswordChange()).Methods("PUT") //почта + новый пароль -> статус:200 json {Модель пользователя с очищенным полем пароля}
 }
 
 func (s *server) handleUsersCreate() http.HandlerFunc {

@@ -6,7 +6,9 @@ import (
 	"restApi/internal/app/store/sqlstore"
 )
 
+//  запуск сервера
 func Start(config *Config) error {
+
 	db, err := newDB(config.DatabaseURL)
 	if err != nil {
 		return err
@@ -17,6 +19,7 @@ func Start(config *Config) error {
 	return http.ListenAndServe(config.BindAddr, server)
 }
 
+// инициализация бд
 func newDB(databaseURL string) (*sql.DB, error) {
 	db, err := sql.Open("postgres", databaseURL)
 	if err != nil {

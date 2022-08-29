@@ -85,4 +85,12 @@ func (r *UserRepository) ChangePassword(u *model.User) error {
 	).Scan(&u.ID)
 }
 
+func (r *UserRepository) UpdateEducationDepartment(u *model.User, educationDepartment bool) error {
+	return r.store.db.QueryRow(
+		"UPDATE users SET educationDepartment = $1 WHERE email = $2 RETURNING ID",
+		educationDepartment,
+		u.Email,
+	).Scan(&u.ID)
+}
+
 //"$2a$04$Wfw9nXhI.4cM40JXvhw7CePo6BbrXaF8dTwRCWtDiHGYfbfIipDEa"

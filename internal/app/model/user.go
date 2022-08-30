@@ -7,13 +7,29 @@ import (
 )
 
 type User struct {
-	ID                int    `json:"id"`
-	Email             string `json:"email"`
-	Password          string `json:"password,omitempty"`
-	Isadmin           bool   `json:"isadmin"`
-	EncryptedPassword string `json:"-"`
+	ID                          int    `json:"id"`
+	Email                       string `json:"email"`
+	Password                    string `json:"password,omitempty"`
+	Isadmin                     bool   `json:"isadmin"`
+	EncryptedPassword           string `json:"-"`
+	EducationDepartment         bool   `json:"educationDepartment"`
+	SourceTrackingDepartment    bool   `json:"sourceTrackingDepartment"`
+	PeriodicReportingDepartment bool   `json:"periodicReportingDepartment"`
+	InternationalDepartment     bool   `json:"internationalDepartment"`
+	DocumentationDepartment     bool   `json:"documentationDepartment"`
+	NrDepartment                bool   `json:"nrDepartment"`
+	DbDepartment                bool   `json:"dbDepartment"`
 }
 
+/*
+sourceTrackingDepartment boolean DEFAULT false,
+
+	periodicReportingDepartment boolean DEFAULT false,
+	internationalDepartment boolean DEFAULT false,
+	documentationDepartment boolean DEFAULT false,
+	nrDepartment boolean DEFAULT false,
+	dbDepartment boolean DEFAULT false
+*/
 func (u *User) Validate() error {
 	return validation.ValidateStruct(
 		u,

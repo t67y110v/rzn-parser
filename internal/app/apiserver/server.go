@@ -3,6 +3,7 @@ package apiserver
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"restApi/internal/app/model"
 	"restApi/internal/app/store"
@@ -43,6 +44,8 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("/makeAdmin", s.handleAdminUpdate()).Methods("PUT")         //почта  -> статус:200 json {isAdmin:true}
 	s.router.HandleFunc("/makeManager", s.handleManagerUpdate()).Methods("PUT")     //почта  -> статус:200 json {isAdmin:false}
 	s.router.HandleFunc("/changePassword", s.handlePasswordChange()).Methods("PUT") //почта + новый пароль -> статус:200 json {Модель пользователя с очищенным полем пароля}
+	s.router.HandleFunc("/departmentCondition", s.handleDepartmentCondition()).Methods("POST")
+	s.router.HandleFunc("/departmentUpdate", s.handleDepartmentUpdate()).Methods("PUT")
 }
 
 func (s *server) handleUsersCreate() http.HandlerFunc {
@@ -176,6 +179,88 @@ func (s *server) handlePasswordChange() http.HandlerFunc {
 		u.Sanitize()
 		s.respond(w, r, http.StatusOK, u)
 	}
+}
+
+func (s *server) handleDepartmentCondition() http.HandlerFunc {
+	type request struct {
+		Email string `json:"email"`
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := &request{}
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+		u, err := s.store.User().DepartmentCondition(req.Email)
+		if err != nil {
+			return
+		}
+		type resp struct {
+			EducationDepartment         bool `json:"educationDepartment"`
+			SourceTrackingDepartment    bool `json:"sourceTrackingDepartment"`
+			PeriodicReportingDepartment bool `json:"periodicReportingDepartment"`
+			InternationalDepartment     bool `json:"internationalDepartment"`
+			DocumentationDepartment     bool `json:"documentationDepartment"`
+			NrDepartment                bool `json:"nrDepartment"`
+			DbDepartment                bool `json:"dbDepartment"`
+		}
+		res := &resp{}
+		res.EducationDepartment = u.EducationDepartment
+		res.SourceTrackingDepartment = u.SourceTrackingDepartment
+		res.PeriodicReportingDepartment = u.PeriodicReportingDepartment
+		res.InternationalDepartment = u.InternationalDepartment
+		res.DocumentationDepartment = u.DocumentationDepartment
+		res.NrDepartment = u.NrDepartment
+		res.DbDepartment = u.DbDepartment
+		s.respond(w, r, http.StatusOK, res)
+	}
+}
+
+func (s *server) handleDepartmentUpdate() http.HandlerFunc {
+
+	type request struct {
+		Email                       string `json:"email"`
+		EducationDepartment         bool   `json:"educationDepartment"`
+		SourceTrackingDepartment    bool   `json:"sourceTrackingDepartment"`
+		PeriodicReportingDepartment bool   `json:"periodicReportingDepartment"`
+		InternationalDepartment     bool   `json:"internationalDepartment"`
+		DocumentationDepartment     bool   `json:"documentationDepartment"`
+		NrDepartment                bool   `json:"nrDepartment"`
+		DbDepartment                bool   `json:"dbDepartment"`
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		req := &request{}
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+		u, err := s.store.User().DepartmentUpdate(req.Email, req.EducationDepartment, req.SourceTrackingDepartment, req.PeriodicReportingDepartment, req.InternationalDepartment, req.DocumentationDepartment, req.NrDepartment, req.DbDepartment)
+		if err != nil {
+			fmt.Println("тут")
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+		type resp struct {
+			EducationDepartment         bool `json:"educationDepartment"`
+			SourceTrackingDepartment    bool `json:"sourceTrackingDepartment"`
+			PeriodicReportingDepartment bool `json:"periodicReportingDepartment"`
+			InternationalDepartment     bool `json:"internationalDepartment"`
+			DocumentationDepartment     bool `json:"documentationDepartment"`
+			NrDepartment                bool `json:"nrDepartment"`
+			DbDepartment                bool `json:"dbDepartment"`
+		}
+		res := &resp{}
+		res.EducationDepartment = u.EducationDepartment
+		res.SourceTrackingDepartment = u.SourceTrackingDepartment
+		res.PeriodicReportingDepartment = u.PeriodicReportingDepartment
+		res.InternationalDepartment = u.InternationalDepartment
+		res.DocumentationDepartment = u.DocumentationDepartment
+		res.NrDepartment = u.NrDepartment
+		res.DbDepartment = u.DbDepartment
+		s.respond(w, r, http.StatusOK, res)
+	}
+
 }
 
 func (s *server) error(w http.ResponseWriter, r *http.Request, code int, err error) {

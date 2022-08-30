@@ -8,4 +8,6 @@ type UserRepository interface {
 	UpdateRoleAdmin(string) (*model.User, error)
 	UpdateRoleManager(string) (*model.User, error)
 	ChangePassword(*model.User) error
+	DepartmentCondition(string) (*model.User, error)
+	DepartmentUpdate(string, bool, bool, bool, bool, bool, bool, bool) (*model.User, error)
 }

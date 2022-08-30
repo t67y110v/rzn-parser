@@ -63,3 +63,23 @@ func (r *UserRepository) ChangePassword(u *model.User) error {
 	r.users[u.Email] = u
 	return nil
 }
+
+func (r *UserRepository) DepartmentCondition(string) (*model.User, error) {
+	u := &model.User{}
+
+	if err := u.BeforeCreate(); err != nil {
+		return u, err
+	}
+	r.users[u.Email] = u
+	return u, nil
+}
+
+func (r *UserRepository) DepartmentUpdate(string, bool, bool, bool, bool, bool, bool, bool) (*model.User, error) {
+	u := &model.User{}
+
+	if err := u.BeforeCreate(); err != nil {
+		return u, err
+	}
+	r.users[u.Email] = u
+	return u, nil
+}

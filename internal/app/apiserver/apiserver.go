@@ -6,7 +6,7 @@ import (
 	"restApi/internal/app/store/sqlstore"
 )
 
-//  запуск сервера
+// запуск сервера
 func Start(config *Config) error {
 
 	db, err := newDB(config.DatabaseURL)

@@ -93,4 +93,71 @@ func (r *UserRepository) UpdateEducationDepartment(u *model.User, educationDepar
 	).Scan(&u.ID)
 }
 
+func (r *UserRepository) DepartmentCondition(email string) (*model.User, error) {
+
+	u := &model.User{}
+	if err := r.store.db.QueryRow(
+		"SELECT educationDepartment, sourceTrackingDepartment,periodicReportingDepartment, internationalDepartment ,documentationDepartment, nrDepartment, dbDepartment FROM users WHERE email = $1",
+		email,
+	).Scan(
+		&u.EducationDepartment,
+		&u.SourceTrackingDepartment,
+		&u.PeriodicReportingDepartment,
+		&u.InternationalDepartment,
+		&u.DocumentationDepartment,
+		&u.NrDepartment,
+		&u.DbDepartment,
+	); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, store.ErrRecordNotFound
+		}
+
+		return nil, err
+	}
+	return u, nil
+
+}
+
+func (r *UserRepository) DepartmentUpdate(email string, educationDepartment bool, sourceTrackingDepartment bool, periodicReportingDepartment bool, internationalDepartment bool, documentationDepartment bool, nrDepartment bool, dbDepartment bool) (*model.User, error) {
+
+	u := &model.User{}
+	if err := r.store.db.QueryRow(
+		"UPDATE users SET educationDepartment = $1, sourceTrackingDepartment = $2, periodicReportingDepartment = $3, internationalDepartment = $4, documentationDepartment = $5, nrDepartment = $6, dbDepartment = $7 WHERE email = $8 RETURNING  educationDepartment,sourceTrackingDepartment,periodicReportingDepartment,internationalDepartment,documentationDepartment,nrDepartment,dbDepartment ",
+		educationDepartment,
+		sourceTrackingDepartment,
+		periodicReportingDepartment,
+		internationalDepartment,
+		documentationDepartment,
+		nrDepartment,
+		dbDepartment,
+		email,
+	).Scan(
+		&u.EducationDepartment,
+		&u.SourceTrackingDepartment,
+		&u.PeriodicReportingDepartment,
+		&u.InternationalDepartment,
+		&u.DocumentationDepartment,
+		&u.NrDepartment,
+		&u.DbDepartment,
+	); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, store.ErrRecordNotFound
+		}
+
+		return nil, err
+	}
+	return u, nil
+
+}
+
 //"$2a$04$Wfw9nXhI.4cM40JXvhw7CePo6BbrXaF8dTwRCWtDiHGYfbfIipDEa"
+/*
+
+ educationDepartment boolean DEFAULT false,
+  sourceTrackingDepartment boolean DEFAULT false,
+  periodicReportingDepartment boolean DEFAULT false,
+  internationalDepartment boolean DEFAULT false,
+  documentationDepartment boolean DEFAULT false,
+  nrDepartment boolean DEFAULT false,
+  dbDepartment boolean DEFAULT false
+*/

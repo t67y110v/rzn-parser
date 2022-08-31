@@ -74,7 +74,7 @@ func (r *UserRepository) DepartmentCondition(string) (*model.User, error) {
 	return u, nil
 }
 
-func (r *UserRepository) DepartmentUpdate(string, bool, bool, bool, bool, bool, bool, bool) (*model.User, error) {
+func (r *UserRepository) DepartmentUpdate(string, bool, bool, bool, bool, bool, bool, bool, bool) (*model.User, error) {
 	u := &model.User{}
 
 	if err := u.BeforeCreate(); err != nil {

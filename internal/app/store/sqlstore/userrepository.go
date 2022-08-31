@@ -132,11 +132,11 @@ func (r *UserRepository) DepartmentCondition(email string) (*model.User, error) 
 
 }
 
-func (r *UserRepository) DepartmentUpdate(email string, educationDepartment bool, sourceTrackingDepartment bool, periodicReportingDepartment bool, internationalDepartment bool, documentationDepartment bool, nrDepartment bool, dbDepartment bool) (*model.User, error) {
+func (r *UserRepository) DepartmentUpdate(email string, educationDepartment bool, sourceTrackingDepartment bool, periodicReportingDepartment bool, internationalDepartment bool, documentationDepartment bool, nrDepartment bool, dbDepartment bool, isadmin bool) (*model.User, error) {
 
 	u := &model.User{}
 	if err := r.store.db.QueryRow(
-		"UPDATE users SET educationDepartment = $1, sourceTrackingDepartment = $2, periodicReportingDepartment = $3, internationalDepartment = $4, documentationDepartment = $5, nrDepartment = $6, dbDepartment = $7 WHERE email = $8 RETURNING  educationDepartment,sourceTrackingDepartment,periodicReportingDepartment,internationalDepartment,documentationDepartment,nrDepartment,dbDepartment ",
+		"UPDATE users SET educationDepartment = $1, sourceTrackingDepartment = $2, periodicReportingDepartment = $3, internationalDepartment = $4, documentationDepartment = $5, nrDepartment = $6, dbDepartment = $7, isadmin = $9 WHERE email = $8 RETURNING  isadmin,educationDepartment,sourceTrackingDepartment,periodicReportingDepartment,internationalDepartment,documentationDepartment,nrDepartment,dbDepartment ",
 		educationDepartment,
 		sourceTrackingDepartment,
 		periodicReportingDepartment,
@@ -145,6 +145,7 @@ func (r *UserRepository) DepartmentUpdate(email string, educationDepartment bool
 		nrDepartment,
 		dbDepartment,
 		email,
+		isadmin,
 	).Scan(
 		&u.EducationDepartment,
 		&u.SourceTrackingDepartment,
@@ -153,6 +154,7 @@ func (r *UserRepository) DepartmentUpdate(email string, educationDepartment bool
 		&u.DocumentationDepartment,
 		&u.NrDepartment,
 		&u.DbDepartment,
+		&u.Isadmin,
 	); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, store.ErrRecordNotFound

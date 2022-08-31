@@ -51,6 +51,7 @@ func (s *server) configureRouter() {
 func (s *server) handleUsersCreate() http.HandlerFunc {
 	type request struct {
 		Email                       string `json:"email"`
+		IsAdmin                     bool   `json:"isadmin"`
 		Password                    string `json:"password"`
 		Name                        string `json:"name"`
 		SeccondName                 string `json:"seccondName"`
@@ -79,7 +80,7 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 			return
 		}
 		u.Sanitize()
-		_, err := s.store.User().DepartmentUpdate(req.Email, req.EducationDepartment, req.SourceTrackingDepartment, req.PeriodicReportingDepartment, req.InternationalDepartment, req.DocumentationDepartment, req.NrDepartment, req.DbDepartment)
+		_, err := s.store.User().DepartmentUpdate(req.Email, req.EducationDepartment, req.SourceTrackingDepartment, req.PeriodicReportingDepartment, req.InternationalDepartment, req.DocumentationDepartment, req.NrDepartment, req.DbDepartment, req.IsAdmin)
 		if err != nil {
 			//fmt.Println("тут")
 			s.error(w, r, http.StatusBadRequest, err)
@@ -248,6 +249,7 @@ func (s *server) handleDepartmentUpdate() http.HandlerFunc {
 
 	type request struct {
 		Email                       string `json:"email"`
+		IsAdmin                     bool   `json:"isadmin"`
 		EducationDepartment         bool   `json:"educationDepartment"`
 		SourceTrackingDepartment    bool   `json:"sourceTrackingDepartment"`
 		PeriodicReportingDepartment bool   `json:"periodicReportingDepartment"`
@@ -263,13 +265,14 @@ func (s *server) handleDepartmentUpdate() http.HandlerFunc {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
-		u, err := s.store.User().DepartmentUpdate(req.Email, req.EducationDepartment, req.SourceTrackingDepartment, req.PeriodicReportingDepartment, req.InternationalDepartment, req.DocumentationDepartment, req.NrDepartment, req.DbDepartment)
+		u, err := s.store.User().DepartmentUpdate(req.Email, req.EducationDepartment, req.SourceTrackingDepartment, req.PeriodicReportingDepartment, req.InternationalDepartment, req.DocumentationDepartment, req.NrDepartment, req.DbDepartment, req.IsAdmin)
 		if err != nil {
 			//fmt.Println("тут")
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
 		type resp struct {
+			IsAdmin                     bool `json:"isadmin"`
 			EducationDepartment         bool `json:"educationDepartment"`
 			SourceTrackingDepartment    bool `json:"sourceTrackingDepartment"`
 			PeriodicReportingDepartment bool `json:"periodicReportingDepartment"`

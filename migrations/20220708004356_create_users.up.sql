@@ -5,11 +5,11 @@ CREATE TABLE users (
   userName varchar not null,
   seccondName varchar not null,
   isadmin boolean DEFAULT false,
-  educationDepartment boolean DEFAULT false,
-  sourceTrackingDepartment boolean DEFAULT false,
-  periodicReportingDepartment boolean DEFAULT false,
-  internationalDepartment boolean DEFAULT false,
-  documentationDepartment boolean DEFAULT false,
-  nrDepartment boolean DEFAULT false,
-  dbDepartment boolean DEFAULT false
+  educationdepartment boolean DEFAULT false,
+  sourceTrackingdepartment boolean DEFAULT false,
+  periodicReportingdepartment boolean DEFAULT false,
+  internationaldepartment boolean DEFAULT false,
+  documentationdepartment boolean DEFAULT false,
+  nrdepartment boolean DEFAULT false,
+  dbdepartment boolean DEFAULT false
 );

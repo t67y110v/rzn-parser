@@ -19,9 +19,11 @@ func (r *UserRepository) Create(u *model.User) error {
 	}
 
 	return r.store.db.QueryRow(
-		"INSERT INTO users (email, encrypted_password) VALUES ($1, $2) RETURNING id",
+		"INSERT INTO users (email, encrypted_password, userName, seccondName) VALUES ($1, $2,$3,$4) RETURNING id",
 		u.Email,
 		u.EncryptedPassword,
+		u.Name,
+		u.SeccondName,
 	).Scan(&u.ID)
 }
 
@@ -48,7 +50,7 @@ func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 func (r *UserRepository) UpdateRoleAdmin(email string) (*model.User, error) {
 	u := &model.User{}
 	if err := r.store.db.QueryRow(
-		"UPDATE users SET isadmin = true WHERE email = $1 RETURNING id,isadmin",
+		"UPDATE users SET isadmin = true, educationDepartment = true, sourceTrackingDepartment = true, periodicReportingDepartment = true, internationalDepartment = true, documentationDepartment = true, nrDepartment = true, dbDepartment = true WHERE email = $1 RETURNING id,isadmin",
 		email,
 	).Scan(
 		&u.ID,
@@ -62,7 +64,7 @@ func (r *UserRepository) UpdateRoleAdmin(email string) (*model.User, error) {
 func (r *UserRepository) UpdateRoleManager(email string) (*model.User, error) {
 	u := &model.User{}
 	if err := r.store.db.QueryRow(
-		"UPDATE users SET isadmin = false WHERE email = $1 RETURNING id,isadmin",
+		"UPDATE users SET isadmin = false, educationDepartment = false, sourceTrackingDepartment = false, periodicReportingDepartment = false, internationalDepartment = false, documentationDepartment = false, nrDepartment = false, dbDepartment = false WHERE email = $1 RETURNING id,isadmin",
 		email,
 	).Scan(
 		&u.ID,
@@ -148,6 +150,14 @@ func (r *UserRepository) DepartmentUpdate(email string, educationDepartment bool
 	}
 	return u, nil
 
+}
+
+func (r *UserRepository) Delete(email string) error {
+
+	return r.store.db.QueryRow(
+		"DELETE FROM users  WHERE email = $1",
+		email,
+	).Err()
 }
 
 //"$2a$04$Wfw9nXhI.4cM40JXvhw7CePo6BbrXaF8dTwRCWtDiHGYfbfIipDEa"

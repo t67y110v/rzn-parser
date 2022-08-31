@@ -83,3 +83,12 @@ func (r *UserRepository) DepartmentUpdate(string, bool, bool, bool, bool, bool, 
 	r.users[u.Email] = u
 	return u, nil
 }
+func (r *UserRepository) Delete(email string) error {
+	u := &model.User{}
+
+	if err := u.BeforeCreate(); err != nil {
+		return err
+	}
+	r.users[u.Email] = u
+	return nil
+}

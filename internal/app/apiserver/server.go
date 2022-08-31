@@ -3,7 +3,6 @@ package apiserver
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"restApi/internal/app/model"
 	"restApi/internal/app/store"
@@ -39,19 +38,29 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (s *server) configureRouter() {
 	//s.router.Host("{subdomain:[a-z]+}.example.com")
-	s.router.HandleFunc("/users", s.handleUsersCreate()).Methods("POST")            //почта + пароль -> статус:201 json {"id":27,"email":"test3@gmail.com","isadmin":false}
+	s.router.HandleFunc("/users", s.handleUsersCreate()).Methods("POST")            //почта + пароль + имя + фамилия + булевые значения для каждого отдела -> статус:201 json {"id":27,"email":"test3@gmail.com","isadmin":false}
 	s.router.HandleFunc("/sessions", s.handleSessionsCreate()).Methods("POST")      //почта + пароль -> статус:200 json {"isAdmin":"false"}
 	s.router.HandleFunc("/makeAdmin", s.handleAdminUpdate()).Methods("PUT")         //почта  -> статус:200 json {isAdmin:true}
 	s.router.HandleFunc("/makeManager", s.handleManagerUpdate()).Methods("PUT")     //почта  -> статус:200 json {isAdmin:false}
 	s.router.HandleFunc("/changePassword", s.handlePasswordChange()).Methods("PUT") //почта + новый пароль -> статус:200 json {Модель пользователя с очищенным полем пароля}
 	s.router.HandleFunc("/departmentCondition", s.handleDepartmentCondition()).Methods("POST")
 	s.router.HandleFunc("/departmentUpdate", s.handleDepartmentUpdate()).Methods("PUT")
+	s.router.HandleFunc("/deleteUser", s.handleUserDelete()).Methods("DELETE")
 }
 
 func (s *server) handleUsersCreate() http.HandlerFunc {
 	type request struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
+		Email                       string `json:"email"`
+		Password                    string `json:"password"`
+		Name                        string `json:"name"`
+		SeccondName                 string `json:"seccondName"`
+		EducationDepartment         bool   `json:"educationDepartment"`
+		SourceTrackingDepartment    bool   `json:"sourceTrackingDepartment"`
+		PeriodicReportingDepartment bool   `json:"periodicReportingDepartment"`
+		InternationalDepartment     bool   `json:"internationalDepartment"`
+		DocumentationDepartment     bool   `json:"documentationDepartment"`
+		NrDepartment                bool   `json:"nrDepartment"`
+		DbDepartment                bool   `json:"dbDepartment"`
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
 		req := &request{}
@@ -60,15 +69,34 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 			return
 		}
 		u := &model.User{
-			Email:    req.Email,
-			Password: req.Password,
+			Email:       req.Email,
+			Password:    req.Password,
+			Name:        req.Name,
+			SeccondName: req.SeccondName,
 		}
 		if err := s.store.User().Create(u); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
 		}
 		u.Sanitize()
-		s.respond(w, r, http.StatusCreated, u)
+		_, err := s.store.User().DepartmentUpdate(req.Email, req.EducationDepartment, req.SourceTrackingDepartment, req.PeriodicReportingDepartment, req.InternationalDepartment, req.DocumentationDepartment, req.NrDepartment, req.DbDepartment)
+		if err != nil {
+			//fmt.Println("тут")
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+		type resp struct {
+			ID          int    `json:"id"`
+			Email       string `json:"email"`
+			Name        string `json:"name"`
+			SeccondName string `json:"seccondName"`
+		}
+		res := &resp{}
+		res.ID = u.ID
+		res.Email = u.Email
+		res.Name = u.Name
+		res.SeccondName = u.SeccondName
+		s.respond(w, r, http.StatusCreated, res)
 	}
 }
 
@@ -89,13 +117,13 @@ func (s *server) handleSessionsCreate() http.HandlerFunc {
 			return
 		}
 		type resp struct {
-			IsAdmin string `json:"isAdmin"`
+			IsAdmin bool `json:"isAdmin"`
 		}
 		res := &resp{}
 		if u.Isadmin {
-			res.IsAdmin = "true"
+			res.IsAdmin = true
 		} else {
-			res.IsAdmin = "false"
+			res.IsAdmin = false
 		}
 		s.respond(w, r, http.StatusOK, res)
 	}
@@ -237,7 +265,7 @@ func (s *server) handleDepartmentUpdate() http.HandlerFunc {
 		}
 		u, err := s.store.User().DepartmentUpdate(req.Email, req.EducationDepartment, req.SourceTrackingDepartment, req.PeriodicReportingDepartment, req.InternationalDepartment, req.DocumentationDepartment, req.NrDepartment, req.DbDepartment)
 		if err != nil {
-			fmt.Println("тут")
+			//fmt.Println("тут")
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
@@ -261,6 +289,34 @@ func (s *server) handleDepartmentUpdate() http.HandlerFunc {
 		s.respond(w, r, http.StatusOK, res)
 	}
 
+}
+
+func (s *server) handleUserDelete() http.HandlerFunc {
+	type request struct {
+		Email string `json:"email"`
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := &request{}
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+		err := s.store.User().Delete(req.Email)
+		if err != nil {
+			s.error(w, r, http.StatusUnauthorized, errorIncorrectEmailOrPassword)
+			return
+		}
+		type resp struct {
+			Result bool `json:"result"`
+		}
+		res := &resp{}
+		if err == nil {
+			res.Result = true
+		} else {
+			res.Result = false
+		}
+		s.respond(w, r, http.StatusOK, res)
+	}
 }
 
 func (s *server) error(w http.ResponseWriter, r *http.Request, code int, err error) {

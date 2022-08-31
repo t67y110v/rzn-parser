@@ -116,7 +116,7 @@ func (s *server) handleSessionsCreate() http.HandlerFunc {
 			s.error(w, r, http.StatusUnauthorized, errorIncorrectEmailOrPassword)
 			return
 		}
-		type resp struct {
+		/*type resp struct {
 			IsAdmin bool `json:"isAdmin"`
 		}
 		res := &resp{}
@@ -124,8 +124,8 @@ func (s *server) handleSessionsCreate() http.HandlerFunc {
 			res.IsAdmin = true
 		} else {
 			res.IsAdmin = false
-		}
-		s.respond(w, r, http.StatusOK, res)
+		} */
+		s.respond(w, r, http.StatusOK, u)
 	}
 }
 

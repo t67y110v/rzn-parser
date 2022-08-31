@@ -30,13 +30,22 @@ func (r *UserRepository) Create(u *model.User) error {
 func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 	u := &model.User{}
 	if err := r.store.db.QueryRow(
-		"SELECT id, email, encrypted_password, isadmin FROM users WHERE email = $1",
+		"SELECT id, email, encrypted_password, isadmin, username, seccondname, educationDepartment, sourceTrackingDepartment,periodicReportingDepartment, internationalDepartment ,documentationDepartment, nrDepartment, dbDepartment FROM users WHERE email = $1",
 		email,
 	).Scan(
 		&u.ID,
 		&u.Email,
 		&u.EncryptedPassword,
 		&u.Isadmin,
+		&u.Name,
+		&u.SeccondName,
+		&u.EducationDepartment,
+		&u.SourceTrackingDepartment,
+		&u.PeriodicReportingDepartment,
+		&u.InternationalDepartment,
+		&u.DocumentationDepartment,
+		&u.NrDepartment,
+		&u.DbDepartment,
 	); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, store.ErrRecordNotFound
@@ -116,6 +125,9 @@ func (r *UserRepository) DepartmentCondition(email string) (*model.User, error) 
 
 		return nil, err
 	}
+	//if (u.EducationDepartment && u.SourceTrackingDepartment &&u.PeriodicReportingDepartment &&u.InternationalDepartment &&u.DocumentationDepartment &&u.NrDepartment &&u.DbDepartment) != nil {
+
+	//}
 	return u, nil
 
 }

@@ -78,3 +78,70 @@ func TestUserRepository_ChangePassword(t *testing.T) {
 	//assert.Equal(t, u.ComparePassword(u.Password), true)
 	assert.NotNil(t, u)
 }
+
+func TestUserReposetiryDelete(t *testing.T) {
+	var err error
+	db, teardown := sqlstore.TestDB(t, databaseURL)
+
+	defer teardown("users")
+	s := sqlstore.New(db)
+	u := model.TestUser(t)
+	u.Email = "test21@mail.com"
+	s.User().Create(u)
+	err = s.User().Delete(u.Email)
+	assert.NoError(t, err)
+
+}
+
+func TestUserRepositoryDepartmentCondition(t *testing.T) {
+	db, teardown := sqlstore.TestDB(t, databaseURL)
+
+	defer teardown("users")
+	s := sqlstore.New(db)
+	u := model.TestUser(t)
+	u.Email = "test21@mail.com"
+	u.Name = "oleg"
+	u.SeccondName = "test"
+	u.EducationDepartment = true
+	u.SourceTrackingDepartment = false
+	u.PeriodicReportingDepartment = false
+	u.InternationalDepartment = false
+	u.DocumentationDepartment = false
+	u.NrDepartment = false
+	u.DbDepartment = false
+	u.Isadmin = true
+	s.User().Create(u)
+	s.User().DepartmentCondition(u.Email)
+	assert.Equal(t, u.Name, "oleg")
+	assert.Equal(t, u.SeccondName, "test")
+	assert.Equal(t, u.EducationDepartment, true)
+	assert.Equal(t, u.SourceTrackingDepartment, false)
+	assert.NotEqual(t, u.PeriodicReportingDepartment, true)
+	assert.Equal(t, u.InternationalDepartment, false)
+	assert.Equal(t, u.DocumentationDepartment, false)
+	assert.Equal(t, u.NrDepartment, false)
+	assert.Equal(t, u.NrDepartment, false)
+
+}
+
+func TestUserRepositoryDepartmentUpdate(t *testing.T) {
+	db, teardown := sqlstore.TestDB(t, databaseURL)
+
+	defer teardown("users")
+	s := sqlstore.New(db)
+	u := model.TestUser(t)
+	u.Email = "test21@mail.com"
+	u.Name = "oleg"
+	u.SeccondName = "test"
+	u.EducationDepartment = true
+	u.SourceTrackingDepartment = false
+	u.PeriodicReportingDepartment = false
+	u.InternationalDepartment = false
+	u.DocumentationDepartment = false
+	u.NrDepartment = false
+	u.DbDepartment = false
+	u.Isadmin = true
+	s.User().Create(u)
+	_, err := s.User().DepartmentUpdate(u.Email, false, false, false, false, false, false, false, false)
+	assert.NoError(t, err)
+}

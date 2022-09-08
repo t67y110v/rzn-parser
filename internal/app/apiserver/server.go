@@ -44,7 +44,7 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("/makeManager", s.handleManagerUpdate()).Methods("PUT")     //почта  -> статус:200 json {isAdmin:false}
 	s.router.HandleFunc("/changePassword", s.handlePasswordChange()).Methods("PUT") //почта + новый пароль -> статус:200 json {Модель пользователя с очищенным полем пароля}
 	s.router.HandleFunc("/departmentCondition", s.handleDepartmentCondition()).Methods("POST")
-	s.router.HandleFunc("/departmentUpdate", s.handleDepartmentUpdate()).Methods("PUT")
+	s.router.HandleFunc("/departmentUpdate", s.handleUserUpdate()).Methods("PUT")
 	s.router.HandleFunc("/deleteUser", s.handleUserDelete()).Methods("DELETE")
 }
 
@@ -80,7 +80,7 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 			return
 		}
 		u.Sanitize()
-		_, err := s.store.User().DepartmentUpdate(req.Email, req.EducationDepartment, req.SourceTrackingDepartment, req.PeriodicReportingDepartment, req.InternationalDepartment, req.DocumentationDepartment, req.NrDepartment, req.DbDepartment, req.IsAdmin)
+		_, err := s.store.User().DepartmentUpdate(req.Email, req.Name, req.SeccondName, req.EducationDepartment, req.SourceTrackingDepartment, req.PeriodicReportingDepartment, req.InternationalDepartment, req.DocumentationDepartment, req.NrDepartment, req.DbDepartment, req.IsAdmin)
 		if err != nil {
 			//fmt.Println("тут")
 			s.error(w, r, http.StatusBadRequest, err)
@@ -245,10 +245,12 @@ func (s *server) handleDepartmentCondition() http.HandlerFunc {
 	}
 }
 
-func (s *server) handleDepartmentUpdate() http.HandlerFunc {
+func (s *server) handleUserUpdate() http.HandlerFunc {
 
 	type request struct {
 		Email                       string `json:"email"`
+		Name                        string `json:"name"`
+		SeccondName                 string `json:"seccondName"`
 		IsAdmin                     bool   `json:"isadmin"`
 		EducationDepartment         bool   `json:"educationDepartment"`
 		SourceTrackingDepartment    bool   `json:"sourceTrackingDepartment"`
@@ -265,7 +267,7 @@ func (s *server) handleDepartmentUpdate() http.HandlerFunc {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
-		u, err := s.store.User().DepartmentUpdate(req.Email, req.EducationDepartment, req.SourceTrackingDepartment, req.PeriodicReportingDepartment, req.InternationalDepartment, req.DocumentationDepartment, req.NrDepartment, req.DbDepartment, req.IsAdmin)
+		u, err := s.store.User().DepartmentUpdate(req.Email, req.Name, req.SeccondName, req.EducationDepartment, req.SourceTrackingDepartment, req.PeriodicReportingDepartment, req.InternationalDepartment, req.DocumentationDepartment, req.NrDepartment, req.DbDepartment, req.IsAdmin)
 		if err != nil {
 			//fmt.Println("тут")
 			s.error(w, r, http.StatusBadRequest, err)

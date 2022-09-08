@@ -132,11 +132,11 @@ func (r *UserRepository) DepartmentCondition(email string) (*model.User, error) 
 
 }
 
-func (r *UserRepository) DepartmentUpdate(email string, educationDepartment bool, sourceTrackingDepartment bool, periodicReportingDepartment bool, internationalDepartment bool, documentationDepartment bool, nrDepartment bool, dbDepartment bool, isadmin bool) (*model.User, error) {
+func (r *UserRepository) DepartmentUpdate(email string, name string, seccondname string, educationDepartment bool, sourceTrackingDepartment bool, periodicReportingDepartment bool, internationalDepartment bool, documentationDepartment bool, nrDepartment bool, dbDepartment bool, isadmin bool) (*model.User, error) {
 
 	u := &model.User{}
 	if err := r.store.db.QueryRow(
-		"UPDATE users SET educationDepartment = $1, sourceTrackingDepartment = $2, periodicReportingDepartment = $3, internationalDepartment = $4, documentationDepartment = $5, nrDepartment = $6, dbDepartment = $7, isadmin = $9 WHERE email = $8 RETURNING  isadmin,educationDepartment,sourceTrackingDepartment,periodicReportingDepartment,internationalDepartment,documentationDepartment,nrDepartment,dbDepartment ",
+		"UPDATE users SET educationDepartment = $1, sourceTrackingDepartment = $2, periodicReportingDepartment = $3, internationalDepartment = $4, documentationDepartment = $5, nrDepartment = $6, dbDepartment = $7, isadmin = $9, username = $10 , seccondname = $11  WHERE email = $8 RETURNING  isadmin,educationDepartment,sourceTrackingDepartment,periodicReportingDepartment,internationalDepartment,documentationDepartment,nrDepartment,dbDepartment ",
 		educationDepartment,
 		sourceTrackingDepartment,
 		periodicReportingDepartment,
@@ -146,6 +146,8 @@ func (r *UserRepository) DepartmentUpdate(email string, educationDepartment bool
 		dbDepartment,
 		email,
 		isadmin,
+		name,
+		seccondname,
 	).Scan(
 		&u.EducationDepartment,
 		&u.SourceTrackingDepartment,

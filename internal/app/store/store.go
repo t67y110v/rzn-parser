@@ -1,5 +1,9 @@
 package store
 
-type Store interface {
+type UserStore interface {
 	User() UserRepository
+}
+
+type DepartmentStore interface {
+	Department() DepartmentRepository
 }

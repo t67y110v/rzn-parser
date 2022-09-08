@@ -12,3 +12,7 @@ type UserRepository interface {
 	DepartmentCondition(string) (*model.User, error)
 	DepartmentUpdate(string, bool, bool, bool, bool, bool, bool, bool, bool) (*model.User, error)
 }
+
+type DepartmentRepository interface {
+	NrDepartmentAddNewPosition(*model.NrDepartment) error
+}

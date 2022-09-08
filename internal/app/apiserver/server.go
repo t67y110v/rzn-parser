@@ -18,10 +18,10 @@ var (
 type server struct {
 	router *mux.Router
 	logger *logrus.Logger
-	store  store.Store
+	store  store.UserStore
 }
 
-func newServer(store store.Store) *server {
+func newServer(store store.UserStore) *server {
 	s := &server{
 		router: mux.NewRouter(),
 		logger: logrus.New(),

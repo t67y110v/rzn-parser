@@ -3,7 +3,7 @@ package apiserver
 import (
 	"database/sql"
 	"net/http"
-	"restApi/internal/app/store/sqlstore"
+	sqlstore "restApi/internal/app/store/sqlstore/users"
 )
 
 // запуск сервера

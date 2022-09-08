@@ -3,7 +3,7 @@ package sqlstore_test
 import (
 	"restApi/internal/app/model"
 	"restApi/internal/app/store"
-	"restApi/internal/app/store/sqlstore"
+	sqlstore "restApi/internal/app/store/sqlstore/users"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

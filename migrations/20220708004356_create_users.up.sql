@@ -13,3 +13,4 @@ CREATE TABLE users (
   nrdepartment boolean DEFAULT false,
   dbdepartment boolean DEFAULT false
 );
+

@@ -67,9 +67,6 @@ func (r *UserRepository) ChangePassword(u *model.User) error {
 func (r *UserRepository) DepartmentCondition(string) (*model.User, error) {
 	u := &model.User{}
 
-	if err := u.BeforeCreate(); err != nil {
-		return u, err
-	}
 	r.users[u.Email] = u
 	return u, nil
 }

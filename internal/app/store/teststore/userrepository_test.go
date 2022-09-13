@@ -31,3 +31,67 @@ func TestUserRepository_FindByEmail(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, u.Email, "userTest1@test.org")
 }
+
+func TestUserRepository_UpdateRoleAdmin(t *testing.T) {
+	//email := "user@test.com"
+	s := teststore.New()
+	u := model.TestUser(t)
+	u.Isadmin = false
+	var err error
+	u, err = s.User().UpdateRoleAdmin(u.Email)
+	assert.NoError(t, err)
+	assert.Equal(t, u.Isadmin, true)
+
+}
+
+func TestUserRepository_UpdateRoleManager(t *testing.T) {
+	//email := "user@test.com"
+	s := teststore.New()
+	u := model.TestUser(t)
+	u.Isadmin = true
+	var err error
+	u, err = s.User().UpdateRoleManager(u.Email)
+	assert.NoError(t, err)
+	assert.Equal(t, u.Isadmin, false)
+
+}
+
+func TestUserRepository_ChangePassword(t *testing.T) {
+	var err error
+	s := teststore.New()
+	u := model.TestUser(t)
+	u.Password = "123"
+	s.User().Create(u)
+	s.User().ChangePassword(u)
+	//u, err = s.User().FindByEmail(u.Email)
+	assert.NoError(t, err)
+	//assert.Equal(t, u.ComparePassword(u.Password), true)
+	assert.NotNil(t, u)
+
+}
+
+func TestUserRepository_DepartmentCondition(t *testing.T) {
+	var err error
+	s := teststore.New()
+	u := model.TestUser(t)
+	u.Password = "123"
+	s.User().Create(u)
+	u, err = s.User().DepartmentCondition(u.Email)
+	//u, err = s.User().FindByEmail(u.Email)
+	assert.NoError(t, err)
+	//assert.Equal(t, u.ComparePassword(u.Password), true)
+	assert.NotNil(t, u)
+}
+
+func TestUserReposytory_DepartmentUpdate(t *testing.T) {
+	var err error
+	s := teststore.New()
+	u := model.TestUser(t)
+	s.User().Create(u)
+	u.EducationDepartment = false
+	u.DbDepartment = true
+	u, err = s.User().DepartmentUpdate(u.Email, u.Name, u.SeccondName, true, true, true, false, false, false, false, false)
+	assert.NoError(t, err)
+	assert.Equal(t, u.EducationDepartment, true)
+	assert.Equal(t, u.DbDepartment, false)
+}

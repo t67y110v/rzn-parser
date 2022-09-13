@@ -10,6 +10,8 @@ type UserRepository struct {
 	store *Store
 }
 
+//Созданик пользователя и занесение его в БД
+
 func (r *UserRepository) Create(u *model.User) error {
 	if err := u.Validate(); err != nil {
 		return err
@@ -26,6 +28,8 @@ func (r *UserRepository) Create(u *model.User) error {
 		u.SeccondName,
 	).Scan(&u.ID)
 }
+
+//Поиск пользователя в базе по почте
 
 func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 	u := &model.User{}
@@ -56,6 +60,9 @@ func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 	return u, nil
 
 }
+
+//обновление роли пользователя по почте
+
 func (r *UserRepository) UpdateRoleAdmin(email string) (*model.User, error) {
 	u := &model.User{}
 	if err := r.store.db.QueryRow(
@@ -85,6 +92,8 @@ func (r *UserRepository) UpdateRoleManager(email string) (*model.User, error) {
 	return u, nil
 }
 
+//Смена пароля пользователя
+
 func (r *UserRepository) ChangePassword(u *model.User) error {
 	if err := u.BeforeCreate(); err != nil {
 		return err
@@ -96,6 +105,8 @@ func (r *UserRepository) ChangePassword(u *model.User) error {
 	).Scan(&u.ID)
 }
 
+//Обновление конкретного отедла у пользвоаотеля
+
 func (r *UserRepository) UpdateEducationDepartment(u *model.User, educationDepartment bool) error {
 	return r.store.db.QueryRow(
 		"UPDATE users SET educationDepartment = $1 WHERE email = $2 RETURNING ID",
@@ -103,6 +114,8 @@ func (r *UserRepository) UpdateEducationDepartment(u *model.User, educationDepar
 		u.Email,
 	).Scan(&u.ID)
 }
+
+//Выдает информацию по пренадлежности пользователя к отделам булевые переменные
 
 func (r *UserRepository) DepartmentCondition(email string) (*model.User, error) {
 
@@ -125,12 +138,15 @@ func (r *UserRepository) DepartmentCondition(email string) (*model.User, error) 
 
 		return nil, err
 	}
-	//if (u.EducationDepartment && u.SourceTrackingDepartment &&u.PeriodicReportingDepartment &&u.InternationalDepartment &&u.DocumentationDepartment &&u.NrDepartment &&u.DbDepartment) != nil {
 
-	//}
+	if !(u.EducationDepartment && u.SourceTrackingDepartment && u.PeriodicReportingDepartment && u.InternationalDepartment && u.DocumentationDepartment && u.NrDepartment && u.DbDepartment) {
+		return nil, store.ErrEmptyValue
+	}
 	return u, nil
 
 }
+
+//Обновляет  данные об отелах пользователя чья почта передана первым аргументом
 
 func (r *UserRepository) DepartmentUpdate(email string, name string, seccondname string, educationDepartment bool, sourceTrackingDepartment bool, periodicReportingDepartment bool, internationalDepartment bool, documentationDepartment bool, nrDepartment bool, dbDepartment bool, isadmin bool) (*model.User, error) {
 
@@ -167,6 +183,8 @@ func (r *UserRepository) DepartmentUpdate(email string, name string, seccondname
 	return u, nil
 
 }
+
+//Удалеие пользователя по почте
 
 func (r *UserRepository) Delete(email string) error {
 

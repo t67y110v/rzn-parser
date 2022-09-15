@@ -3,12 +3,14 @@ package apiserver
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
+	"restApi/internal/app/logging"
 	"restApi/internal/app/model"
 	"restApi/internal/app/store"
 
 	"github.com/gorilla/mux"
-	"github.com/sirupsen/logrus"
+	//"github.com/sirupsen/logrus"
 )
 
 var (
@@ -17,14 +19,14 @@ var (
 
 type server struct {
 	router *mux.Router
-	logger *logrus.Logger
+	logger logging.Logger
 	store  store.UserStore
 }
 
 func newServer(store store.UserStore) *server {
 	s := &server{
 		router: mux.NewRouter(),
-		logger: logrus.New(),
+		logger: logging.GetLogger(),
 		store:  store,
 	}
 
@@ -38,14 +40,15 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (s *server) configureRouter() {
 	//s.router.Host("{subdomain:[a-z]+}.example.com")
-	s.router.HandleFunc("/users", s.handleUsersCreate()).Methods("POST")                       //почта + пароль + имя + фамилия + булевые значения для каждого отдела -> статус:201 json {"id":27,"email":"test3@gmail.com","isadmin":false}
+	s.router.HandleFunc("/userCreate", s.handleUsersCreate()).Methods("POST")                  //почта + пароль + имя + фамилия + булевые значения для каждого отдела -> статус:201 json {"id":27,"email":"test3@gmail.com","isadmin":false}
+	s.router.HandleFunc("/userUpdate", s.handleUserUpdate()).Methods("PUT")                    //почта + булевые значения для каждого отдела  ->  статус:200 json {"isadmin":false,"educationDepartment":true,"sourceTrackingDepartment":true,"periodicReportingDepartment":false,"internationalDepartment":false,"documentationDepartment":false,"nrDepartment":false,"dbDepartment":true}
+	s.router.HandleFunc("/userDelete", s.handleUserDelete()).Methods("DELETE")                 //почта  -> статус:200 json  {result : true}
 	s.router.HandleFunc("/sessions", s.handleSessionsCreate()).Methods("POST")                 //почта + пароль -> статус:200 json {"isAdmin":"false"}
 	s.router.HandleFunc("/makeAdmin", s.handleAdminUpdate()).Methods("PUT")                    //почта  -> статус:200 json {isAdmin:true}
 	s.router.HandleFunc("/makeManager", s.handleManagerUpdate()).Methods("PUT")                //почта  -> статус:200 json {isAdmin:false}
 	s.router.HandleFunc("/changePassword", s.handlePasswordChange()).Methods("PUT")            //почта + новый пароль -> статус:200 json {Модель пользователя с очищенным полем пароля}
 	s.router.HandleFunc("/departmentCondition", s.handleDepartmentCondition()).Methods("POST") //почта  -> статус:200 json {"isadmin":false,"educationDepartment":true,"sourceTrackingDepartment":true,"periodicReportingDepartment":false,"internationalDepartment":false,"documentationDepartment":false,"nrDepartment":false,"dbDepartment":true}
-	s.router.HandleFunc("/departmentUpdate", s.handleUserUpdate()).Methods("PUT")              //почта + булевые значения для каждого отдела  ->  статус:200 json {"isadmin":false,"educationDepartment":true,"sourceTrackingDepartment":true,"periodicReportingDepartment":false,"internationalDepartment":false,"documentationDepartment":false,"nrDepartment":false,"dbDepartment":true}
-	s.router.HandleFunc("/deleteUser", s.handleUserDelete()).Methods("DELETE")                 //почта  -> статус:200 json  {result : true}
+
 }
 
 func (s *server) handleUsersCreate() http.HandlerFunc {
@@ -67,6 +70,7 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 		req := &request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
+			s.logger.Warningf("handle /userCreate, status :%d, error :%e", http.StatusBadRequest, err)
 			return
 		}
 		u := &model.User{
@@ -77,6 +81,7 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 		}
 		if err := s.store.User().Create(u); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
+			s.logger.Warningf("handle /userCreate, status :%d, error :%e", http.StatusUnprocessableEntity, err)
 			return
 		}
 		u.Sanitize()
@@ -84,6 +89,7 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 		if err != nil {
 			//fmt.Println("тут")
 			s.error(w, r, http.StatusBadRequest, err)
+			s.logger.Warningf("handle /userCreate, status :%d, error :%e", http.StatusBadRequest, err)
 			return
 		}
 		type resp struct {
@@ -97,7 +103,9 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 		res.Email = u.Email
 		res.Name = u.Name
 		res.SeccondName = u.SeccondName
+		log.Printf("")
 		s.respond(w, r, http.StatusCreated, res)
+		s.logger.Infof("handle /userCreate, status :%d", http.StatusCreated)
 	}
 }
 
@@ -110,11 +118,13 @@ func (s *server) handleSessionsCreate() http.HandlerFunc {
 		req := &request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
+			s.logger.Warningf("handle /sessions, status :%d, error :%e", http.StatusBadRequest, err)
 			return
 		}
 		u, err := s.store.User().FindByEmail(req.Email)
 		if err != nil || !u.ComparePassword(req.Password) {
 			s.error(w, r, http.StatusUnauthorized, errorIncorrectEmailOrPassword)
+			s.logger.Warningf("handle /users, status :%d, error :%e", http.StatusUnauthorized, errorIncorrectEmailOrPassword)
 			return
 		}
 		/*type resp struct {
@@ -127,6 +137,7 @@ func (s *server) handleSessionsCreate() http.HandlerFunc {
 			res.IsAdmin = false
 		} */
 		s.respond(w, r, http.StatusOK, u)
+		s.logger.Infof("handle /sessions, status :%d", http.StatusOK)
 	}
 }
 
@@ -138,11 +149,13 @@ func (s *server) handleAdminUpdate() http.HandlerFunc {
 		req := &request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
+			s.logger.Warningf("handle /makeAdmin, status :%d, error :%e", http.StatusBadRequest, err)
 			return
 		}
 		u, err := s.store.User().UpdateRoleAdmin(req.Email)
 		if err != nil {
 			s.error(w, r, http.StatusUnauthorized, errorIncorrectEmailOrPassword)
+			s.logger.Warningf("handle /makeAdmin, status :%d, error :%e", http.StatusUnauthorized, errorIncorrectEmailOrPassword)
 			return
 		}
 		type resp struct {
@@ -155,6 +168,7 @@ func (s *server) handleAdminUpdate() http.HandlerFunc {
 			res.IsAdmin = "false"
 		}
 		s.respond(w, r, http.StatusOK, res)
+		s.logger.Infof("handle /makeAdmin, status :%d", http.StatusOK)
 	}
 }
 
@@ -166,11 +180,13 @@ func (s *server) handleManagerUpdate() http.HandlerFunc {
 		req := &request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
+			s.logger.Warningf("handle /makeManager, status :%d, error :%e", http.StatusBadRequest, err)
 			return
 		}
 		u, err := s.store.User().UpdateRoleManager(req.Email)
 		if err != nil {
 			s.error(w, r, http.StatusUnauthorized, errorIncorrectEmailOrPassword)
+			s.logger.Warningf("handle /makeManager, status :%d, error :%e", http.StatusUnauthorized, errorIncorrectEmailOrPassword)
 			return
 		}
 		type resp struct {
@@ -183,6 +199,7 @@ func (s *server) handleManagerUpdate() http.HandlerFunc {
 			res.IsAdmin = "false"
 		}
 		s.respond(w, r, http.StatusOK, res)
+		s.logger.Infof("handle /makeManager, status :%d", http.StatusOK)
 	}
 }
 
@@ -195,6 +212,7 @@ func (s *server) handlePasswordChange() http.HandlerFunc {
 		req := &request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
+			s.logger.Warningf("handle /changePassword, status :%d, error :%e", http.StatusBadRequest, err)
 			return
 		}
 		u := &model.User{
@@ -203,10 +221,12 @@ func (s *server) handlePasswordChange() http.HandlerFunc {
 		}
 		if err := s.store.User().ChangePassword(u); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
+			s.logger.Warningf("handle /changePassword, status :%d, error :%e", http.StatusUnprocessableEntity, err)
 			return
 		}
 		u.Sanitize()
 		s.respond(w, r, http.StatusOK, u)
+		s.logger.Infof("handle /changePassword, status :%d", http.StatusOK)
 	}
 }
 
@@ -218,10 +238,12 @@ func (s *server) handleDepartmentCondition() http.HandlerFunc {
 		req := &request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
+			s.logger.Warningf("handle /departmentCondition, status :%d, error :%e", http.StatusBadRequest, err)
 			return
 		}
 		u, err := s.store.User().DepartmentCondition(req.Email)
 		if err != nil {
+			s.logger.Warningf("handle /departmentCondition, status :%d, error :%e", http.StatusBadRequest, err)
 			return
 		}
 		type resp struct {
@@ -242,6 +264,7 @@ func (s *server) handleDepartmentCondition() http.HandlerFunc {
 		res.NrDepartment = u.NrDepartment
 		res.DbDepartment = u.DbDepartment
 		s.respond(w, r, http.StatusOK, res)
+		s.logger.Infof("handle /departmentCondition, status :%d", http.StatusOK)
 	}
 }
 
@@ -265,12 +288,13 @@ func (s *server) handleUserUpdate() http.HandlerFunc {
 		req := &request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
+			s.logger.Warningf("handle /userUpdate, status :%d, error :%e", http.StatusBadRequest, err)
 			return
 		}
 		u, err := s.store.User().DepartmentUpdate(req.Email, req.Name, req.SeccondName, req.EducationDepartment, req.SourceTrackingDepartment, req.PeriodicReportingDepartment, req.InternationalDepartment, req.DocumentationDepartment, req.NrDepartment, req.DbDepartment, req.IsAdmin)
 		if err != nil {
-			//fmt.Println("тут")
 			s.error(w, r, http.StatusBadRequest, err)
+			s.logger.Warningf("handle /userUpdate, status :%d, error :%e", http.StatusBadRequest, err)
 			return
 		}
 		type resp struct {
@@ -292,6 +316,7 @@ func (s *server) handleUserUpdate() http.HandlerFunc {
 		res.NrDepartment = u.NrDepartment
 		res.DbDepartment = u.DbDepartment
 		s.respond(w, r, http.StatusOK, res)
+		s.logger.Infof("handle /userUpdate, status :%d", http.StatusOK)
 	}
 
 }
@@ -304,11 +329,13 @@ func (s *server) handleUserDelete() http.HandlerFunc {
 		req := &request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
+			s.logger.Warningf("handle /userDelete, status :%d, error :%e", http.StatusBadRequest, err)
 			return
 		}
 		err := s.store.User().Delete(req.Email)
 		if err != nil {
 			s.error(w, r, http.StatusUnauthorized, errorIncorrectEmailOrPassword)
+			s.logger.Warningf("handle /userDelete, status :%d, error :%e", http.StatusBadRequest, err)
 			return
 		}
 		type resp struct {
@@ -321,6 +348,7 @@ func (s *server) handleUserDelete() http.HandlerFunc {
 			res.Result = false
 		}
 		s.respond(w, r, http.StatusOK, res)
+		s.logger.Infof("handle /userDelete, status :%d", http.StatusOK)
 	}
 }
 

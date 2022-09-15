@@ -2,6 +2,7 @@ package sqlstore
 
 import (
 	"database/sql"
+	"log"
 	"restApi/internal/app/store"
 
 	_ "github.com/lib/pq"
@@ -17,6 +18,7 @@ type Store struct {
 //инициализацияя хранилища
 
 func New(db *sql.DB) *Store {
+	log.Println("Store initialization")
 	return &Store{
 		db: db,
 	}

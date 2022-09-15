@@ -139,9 +139,9 @@ func (r *UserRepository) DepartmentCondition(email string) (*model.User, error) 
 		return nil, err
 	}
 
-	if !(u.EducationDepartment && u.SourceTrackingDepartment && u.PeriodicReportingDepartment && u.InternationalDepartment && u.DocumentationDepartment && u.NrDepartment && u.DbDepartment) {
+	/*if !(u.EducationDepartment && u.SourceTrackingDepartment && u.PeriodicReportingDepartment && u.InternationalDepartment && u.DocumentationDepartment && u.NrDepartment && u.DbDepartment) {
 		return nil, store.ErrEmptyValue
-	}
+	} */
 	return u, nil
 
 }

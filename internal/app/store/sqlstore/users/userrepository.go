@@ -43,13 +43,13 @@ func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 		&u.Isadmin,
 		&u.Name,
 		&u.SeccondName,
-		&u.EducationDepartment,
-		&u.SourceTrackingDepartment,
-		&u.PeriodicReportingDepartment,
-		&u.InternationalDepartment,
-		&u.DocumentationDepartment,
-		&u.NrDepartment,
-		&u.DbDepartment,
+		&u.Department.EducationDepartment,
+		&u.Department.SourceTrackingDepartment,
+		&u.Department.PeriodicReportingDepartment,
+		&u.Department.InternationalDepartment,
+		&u.Department.DocumentationDepartment,
+		&u.Department.NrDepartment,
+		&u.Department.DbDepartment,
 	); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, store.ErrRecordNotFound
@@ -124,13 +124,13 @@ func (r *UserRepository) DepartmentCondition(email string) (*model.User, error) 
 		"SELECT educationDepartment, sourceTrackingDepartment,periodicReportingDepartment, internationalDepartment ,documentationDepartment, nrDepartment, dbDepartment FROM users WHERE email = $1",
 		email,
 	).Scan(
-		&u.EducationDepartment,
-		&u.SourceTrackingDepartment,
-		&u.PeriodicReportingDepartment,
-		&u.InternationalDepartment,
-		&u.DocumentationDepartment,
-		&u.NrDepartment,
-		&u.DbDepartment,
+		&u.Department.EducationDepartment,
+		&u.Department.SourceTrackingDepartment,
+		&u.Department.PeriodicReportingDepartment,
+		&u.Department.InternationalDepartment,
+		&u.Department.DocumentationDepartment,
+		&u.Department.NrDepartment,
+		&u.Department.DbDepartment,
 	); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, store.ErrRecordNotFound
@@ -165,13 +165,13 @@ func (r *UserRepository) DepartmentUpdate(email string, name string, seccondname
 		name,
 		seccondname,
 	).Scan(
-		&u.EducationDepartment,
-		&u.SourceTrackingDepartment,
-		&u.PeriodicReportingDepartment,
-		&u.InternationalDepartment,
-		&u.DocumentationDepartment,
-		&u.NrDepartment,
-		&u.DbDepartment,
+		&u.Department.EducationDepartment,
+		&u.Department.SourceTrackingDepartment,
+		&u.Department.PeriodicReportingDepartment,
+		&u.Department.InternationalDepartment,
+		&u.Department.DocumentationDepartment,
+		&u.Department.NrDepartment,
+		&u.Department.DbDepartment,
 		&u.Isadmin,
 	); err != nil {
 		if err == sql.ErrNoRows {

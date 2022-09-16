@@ -88,10 +88,10 @@ func TestUserReposytory_DepartmentUpdate(t *testing.T) {
 	s := teststore.New()
 	u := model.TestUser(t)
 	s.User().Create(u)
-	u.EducationDepartment = false
-	u.DbDepartment = true
+	u.Department.EducationDepartment = false
+	u.Department.DbDepartment = true
 	u, err = s.User().DepartmentUpdate(u.Email, u.Name, u.SeccondName, true, true, true, false, false, false, false, false)
 	assert.NoError(t, err)
-	assert.Equal(t, u.EducationDepartment, true)
-	assert.Equal(t, u.DbDepartment, false)
+	assert.Equal(t, u.Department.EducationDepartment, true)
+	assert.Equal(t, u.Department.DbDepartment, false)
 }

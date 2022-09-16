@@ -7,20 +7,22 @@ import (
 )
 
 type User struct {
-	ID                          int    `json:"id"`
-	Email                       string `json:"email"`
-	Name                        string `json:"name"`
-	SeccondName                 string `json:"seccondName"`
-	Password                    string `json:"password,omitempty"`
-	Isadmin                     bool   `json:"isadmin"`
-	EncryptedPassword           string `json:"-"`
-	EducationDepartment         bool   `json:"educationDepartment"`
-	SourceTrackingDepartment    bool   `json:"sourceTrackingDepartment"`
-	PeriodicReportingDepartment bool   `json:"periodicReportingDepartment"`
-	InternationalDepartment     bool   `json:"internationalDepartment"`
-	DocumentationDepartment     bool   `json:"documentationDepartment"`
-	NrDepartment                bool   `json:"nrDepartment"`
-	DbDepartment                bool   `json:"dbDepartment"`
+	ID                int    `json:"id"`
+	Email             string `json:"email"`
+	Name              string `json:"name"`
+	SeccondName       string `json:"seccondName"`
+	Password          string `json:"password,omitempty"`
+	Isadmin           bool   `json:"isadmin"`
+	EncryptedPassword string `json:"-"`
+	Department        struct {
+		EducationDepartment         bool `json:"educationDepartment"`
+		SourceTrackingDepartment    bool `json:"sourceTrackingDepartment"`
+		PeriodicReportingDepartment bool `json:"periodicReportingDepartment"`
+		InternationalDepartment     bool `json:"internationalDepartment"`
+		DocumentationDepartment     bool `json:"documentationDepartment"`
+		NrDepartment                bool `json:"nrDepartment"`
+		DbDepartment                bool `json:"dbDepartment"`
+	}
 }
 
 /*

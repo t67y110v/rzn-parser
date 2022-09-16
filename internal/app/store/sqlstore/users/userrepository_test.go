@@ -102,25 +102,25 @@ func TestUserRepositoryDepartmentCondition(t *testing.T) {
 	u.Email = "test21@mail.com"
 	u.Name = "oleg"
 	u.SeccondName = "test"
-	u.EducationDepartment = true
-	u.SourceTrackingDepartment = false
-	u.PeriodicReportingDepartment = false
-	u.InternationalDepartment = false
-	u.DocumentationDepartment = false
-	u.NrDepartment = false
-	u.DbDepartment = false
+	u.Department.EducationDepartment = true
+	u.Department.SourceTrackingDepartment = false
+	u.Department.PeriodicReportingDepartment = false
+	u.Department.InternationalDepartment = false
+	u.Department.DocumentationDepartment = false
+	u.Department.NrDepartment = false
+	u.Department.DbDepartment = false
 	u.Isadmin = true
 	s.User().Create(u)
 	s.User().DepartmentCondition(u.Email)
 	assert.Equal(t, u.Name, "oleg")
 	assert.Equal(t, u.SeccondName, "test")
-	assert.Equal(t, u.EducationDepartment, true)
-	assert.Equal(t, u.SourceTrackingDepartment, false)
-	assert.NotEqual(t, u.PeriodicReportingDepartment, true)
-	assert.Equal(t, u.InternationalDepartment, false)
-	assert.Equal(t, u.DocumentationDepartment, false)
-	assert.Equal(t, u.NrDepartment, false)
-	assert.Equal(t, u.NrDepartment, false)
+	assert.Equal(t, u.Department.EducationDepartment, true)
+	assert.Equal(t, u.Department.SourceTrackingDepartment, false)
+	assert.NotEqual(t, u.Department.PeriodicReportingDepartment, true)
+	assert.Equal(t, u.Department.InternationalDepartment, false)
+	assert.Equal(t, u.Department.DocumentationDepartment, false)
+	assert.Equal(t, u.Department.NrDepartment, false)
+	assert.Equal(t, u.Department.NrDepartment, false)
 
 }
 
@@ -133,13 +133,13 @@ func TestUserRepositoryDepartmentUpdate(t *testing.T) {
 	u.Email = "test21@mail.com"
 	u.Name = "oleg"
 	u.SeccondName = "test"
-	u.EducationDepartment = true
-	u.SourceTrackingDepartment = false
-	u.PeriodicReportingDepartment = false
-	u.InternationalDepartment = false
-	u.DocumentationDepartment = false
-	u.NrDepartment = false
-	u.DbDepartment = false
+	u.Department.EducationDepartment = true
+	u.Department.SourceTrackingDepartment = false
+	u.Department.PeriodicReportingDepartment = false
+	u.Department.InternationalDepartment = false
+	u.Department.DocumentationDepartment = false
+	u.Department.NrDepartment = false
+	u.Department.DbDepartment = false
 	u.Isadmin = true
 	s.User().Create(u)
 	_, err := s.User().DepartmentUpdate(u.Email, u.Name, u.SeccondName, false, false, false, false, false, false, false, false)

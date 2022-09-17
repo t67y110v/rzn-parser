@@ -1,0 +1,16 @@
+{
+    "email": "example@mail.ru",
+    "password" : "eXaMpLe123" ,
+    "name" : "exampleName",
+    "seccondName" : "exampleSeccondName",
+    "Departments" : {
+    "educationDepartment" : true,
+    "sourceTrackingDepartment" : true , 
+    "periodicReportingDepartment" : false ,
+    "internationalDepartment" : false ,
+    "documentationDepartment" : false , 
+    "nrDepartment" : true ,
+    "dbDepartment" : false
+    },
+    "isadmin" : true
+  }

@@ -1,2 +1,2 @@
-all.log
-apiserver.toml
+*.log
+*.toml

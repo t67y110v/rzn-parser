@@ -1,0 +1,11 @@
+{
+    "Departments":{
+        "educationDepartment":true,
+        "sourceTrackingDepartment":true,
+        "periodicReportingDepartment":true,
+        "internationalDepartment":true,
+        "documentationDepartment":true,
+        "nrDepartment":true,
+        "dbDepartment":true
+        }
+    }

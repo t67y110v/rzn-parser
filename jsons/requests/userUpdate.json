@@ -1,0 +1,15 @@
+{
+    "email": "example@mail.ru",
+    "name" : "exampleName",
+    "seccondName" : "exampleSeccondName",
+    "Departments" : {
+    "educationDepartment" : true,
+    "sourceTrackingDepartment" : true , 
+    "periodicReportingDepartment" : false ,
+    "internationalDepartment" : false ,
+    "documentationDepartment" : false , 
+    "nrDepartment" : true ,
+    "dbDepartment" : false
+    },
+    "isadmin" : true
+  }

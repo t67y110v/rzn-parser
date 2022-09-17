@@ -162,13 +162,13 @@ func (s *server) handleAdminUpdate() http.HandlerFunc {
 			return
 		}
 		type resp struct {
-			IsAdmin string `json:"isAdmin"`
+			IsAdmin bool `json:"isAdmin"`
 		}
 		res := &resp{}
 		if u.Isadmin {
-			res.IsAdmin = "true"
+			res.IsAdmin = true
 		} else {
-			res.IsAdmin = "false"
+			res.IsAdmin = false
 		}
 		s.respond(w, r, http.StatusOK, res)
 		s.logger.Infof("handle /makeAdmin, status :%d", http.StatusOK)
@@ -193,13 +193,13 @@ func (s *server) handleManagerUpdate() http.HandlerFunc {
 			return
 		}
 		type resp struct {
-			IsAdmin string `json:"isAdmin"`
+			IsAdmin bool `json:"isAdmin"`
 		}
 		res := &resp{}
 		if u.Isadmin {
-			res.IsAdmin = "true"
+			res.IsAdmin = true
 		} else {
-			res.IsAdmin = "false"
+			res.IsAdmin = false
 		}
 		s.respond(w, r, http.StatusOK, res)
 		s.logger.Infof("handle /makeManager, status :%d", http.StatusOK)

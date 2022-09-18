@@ -1,6 +1,9 @@
 package store
 
-import "restApi/internal/app/model"
+import (
+	"restApi/internal/app/model"
+	dp "restApi/internal/app/model/departments"
+)
 
 type UserRepository interface {
 	Create(*model.User) error
@@ -14,5 +17,5 @@ type UserRepository interface {
 }
 
 type DepartmentRepository interface {
-	NrDepartmentAddNewPosition(*model.NrDepartment) error
+	NrDepartmentAddNewPosition(*dp.NrDepartment) error
 }

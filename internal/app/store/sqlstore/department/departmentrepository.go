@@ -1,7 +1,7 @@
 package department
 
 import (
-	"restApi/internal/app/model"
+	model "restApi/internal/app/model/departments"
 	//."restApi/internal/app/store"
 )
 

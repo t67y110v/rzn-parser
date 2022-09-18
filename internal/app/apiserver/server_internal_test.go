@@ -13,7 +13,7 @@ import (
 )
 
 func TestServer_HandleUsersCreate(t *testing.T) {
-	s := newServer(teststore.New())
+	s := newServer(teststore.New(), nil)
 	testCases := []struct {
 		name         string
 		payload      interface{}
@@ -62,7 +62,7 @@ func TestServer_HabdleSessionsCreate(t *testing.T) {
 	u := model.TestUser(t)
 	store := teststore.New()
 	store.User().Create(u)
-	s := newServer(store)
+	s := newServer(store, nil)
 	testCases := []struct {
 		name         string
 		payload      interface{}

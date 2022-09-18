@@ -74,6 +74,7 @@ func (r *UserRepository) UpdateRoleAdmin(email string) (*model.User, error) {
 	); err != nil {
 		return nil, err
 	}
+
 	u.Email = email
 	return u, nil
 }

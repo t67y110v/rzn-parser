@@ -4,7 +4,7 @@ import "errors"
 
 var (
 	ErrRecordNotFound = errors.New("record not found")
-	ErrEmptyValue     = errors.New("Empty colums in select")
+	ErrEmptyValue     = errors.New("empty colums in select")
 )
 
 // /user=postgres password=p02tgre2 dbname=restapi_test sslmode=disable

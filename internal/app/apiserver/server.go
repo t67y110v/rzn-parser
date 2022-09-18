@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"restApi/internal/app/logging"
+	mail "restApi/internal/app/mailservice"
 	"restApi/internal/app/model"
 	"restApi/internal/app/store"
 
@@ -21,13 +22,15 @@ type server struct {
 	router *mux.Router
 	logger logging.Logger
 	store  store.UserStore
+	config *Config
 }
 
-func newServer(store store.UserStore) *server {
+func newServer(store store.UserStore, config *Config) *server {
 	s := &server{
 		router: mux.NewRouter(),
 		logger: logging.GetLogger(),
 		store:  store,
+		config: config,
 	}
 
 	s.configureRouter()
@@ -48,7 +51,7 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("/makeManager", s.handleManagerUpdate()).Methods("PUT")                //почта  -> статус:200 json {isAdmin:false}
 	s.router.HandleFunc("/changePassword", s.handlePasswordChange()).Methods("PUT")            //почта + новый пароль -> статус:200 json {Модель пользователя с очищенным полем пароля}
 	s.router.HandleFunc("/departmentCondition", s.handleDepartmentCondition()).Methods("POST") //почта  -> статус:200 json {"isadmin":false,"educationDepartment":true,"sourceTrackingDepartment":true,"periodicReportingDepartment":false,"internationalDepartment":false,"documentationDepartment":false,"nrDepartment":false,"dbDepartment":true}
-
+	s.router.HandleFunc("/sendEmail", s.handleSendEmail()).Methods("POST")
 }
 
 func (s *server) handleUsersCreate() http.HandlerFunc {
@@ -344,6 +347,39 @@ func (s *server) handleUserDelete() http.HandlerFunc {
 		}
 		s.respond(w, r, http.StatusOK, res)
 		s.logger.Infof("handle /userDelete, status :%d", http.StatusOK)
+	}
+}
+
+func (s *server) handleSendEmail() http.HandlerFunc {
+	type request struct {
+		RecipientMail string `json:"recipient_mail"`
+		Subject       string `json:"subject"`
+		Body          string `json:"body"`
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := &request{}
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			s.logger.Warningf("handle /sendEmail, status :%d, error :%e", http.StatusBadRequest, err)
+			return
+		}
+		err := mail.SendEmailMessage(s.config.EmailSender, s.config.PasswordSender, req.RecipientMail, req.Subject, req.Body, s.logger)
+		if err != nil {
+			s.error(w, r, http.StatusBadRequest, errorIncorrectEmailOrPassword)
+			s.logger.Warningf("handle /sendEmail, status :%d, error :%e", http.StatusBadRequest, err)
+			return
+		}
+		type resp struct {
+			Result bool `json:"result"`
+		}
+		res := &resp{}
+		if err == nil {
+			res.Result = true
+		} else {
+			res.Result = false
+		}
+		s.respond(w, r, http.StatusOK, res)
+		s.logger.Infof("handle /sendEmail, status :%d", http.StatusOK)
 	}
 }
 

@@ -363,7 +363,7 @@ func (s *server) handleSendEmail() http.HandlerFunc {
 			s.logger.Warningf("handle /sendEmail, status :%d, error :%e", http.StatusBadRequest, err)
 			return
 		}
-		err := mail.SendEmailMessage(s.config.EmailSender, s.config.PasswordSender, req.RecipientMail, req.Subject, req.Body, s.logger)
+		err := mail.SendEmailMessage(s.config.EmailSender, s.config.PasswordSender, s.config.SmtpEmail, req.RecipientMail, req.Subject, req.Body, s.logger)
 		if err != nil {
 			s.error(w, r, http.StatusBadRequest, errorIncorrectEmailOrPassword)
 			s.logger.Warningf("handle /sendEmail, status :%d, error :%e", http.StatusBadRequest, err)

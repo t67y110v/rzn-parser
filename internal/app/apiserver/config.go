@@ -7,6 +7,7 @@ type Config struct {
 	EmailSender    string `toml:"email_sender"`
 	PasswordSender string `toml:"password_sender"`
 	SmptPort       int    `toml:"smpt_port"`
+	SmtpEmail      string `toml:"smtp_email"`
 }
 
 // Default config values
@@ -17,5 +18,6 @@ func NewConfig() *Config {
 		EmailSender:    "",
 		PasswordSender: "",
 		SmptPort:       456,
+		SmtpEmail:      "smtp.yandex.ru",
 	}
 }

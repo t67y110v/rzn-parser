@@ -9,7 +9,7 @@ import (
 	gomail "gopkg.in/mail.v2"
 )
 
-func SendEmailMessage(sendersMail, sendersMailPassword, RecipientMail, Subject, Body string, l logging.Logger) error {
+func SendEmailMessage(sendersMail, sendersMailPassword, smtpEmail, RecipientMail, Subject, Body string, l logging.Logger) error {
 	fmt.Println(sendersMail)
 	fmt.Println(sendersMailPassword)
 	message := gomail.NewMessage()
@@ -17,7 +17,7 @@ func SendEmailMessage(sendersMail, sendersMailPassword, RecipientMail, Subject, 
 	message.SetHeader("To", RecipientMail)
 	message.SetHeader("Subject", Subject)
 	message.SetBody("text/plain", Body) //
-	a := gomail.NewDialer("smtp.yandex.ru", 465, sendersMail, sendersMailPassword)
+	a := gomail.NewDialer(smtpEmail, 465, sendersMail, sendersMailPassword)
 	a.StartTLSPolicy = gomail.MandatoryStartTLS
 	if err := a.DialAndSend(message); err != nil {
 		l.Warningf("Dial and send MailSender error :%e", err)

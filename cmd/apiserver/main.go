@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"log"
 	"restApi/internal/app/apiserver"
 	"restApi/internal/app/logging"
 
@@ -26,7 +25,7 @@ func main() {
 	config := apiserver.NewConfig()
 	_, err := toml.DecodeFile(configPath, config)
 	if err != nil {
-		log.Fatal(err)
+		l.Fatal(err)
 	}
 	l.Infof("Starting apiserver addr : %s\n", config.BindAddr)
 	if err := apiserver.Start(config); err != nil {

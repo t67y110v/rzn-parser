@@ -27,7 +27,7 @@ go get github.com/t67y110v/REST
 
 ```toml
 [server]
-bind_addr=":8081"
+bind_addr=":8080"
 log_level="debug"
 
 [database]

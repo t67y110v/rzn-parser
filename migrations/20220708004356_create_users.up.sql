@@ -13,7 +13,7 @@ CREATE TABLE users (
   nrdepartment boolean DEFAULT false,
   dbdepartment boolean DEFAULT false, 
   monitoringspecialist boolean DEFAULT false,
-  monitoringresponsible int
+  monitoringresponsible int not null
 );
 
 CREATE TABLE apilogs(

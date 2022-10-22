@@ -1,12 +1,14 @@
     {
-    "isadmin":false,
-    "Departments":{
-        "educationDepartment":true,
-        "sourceTrackingDepartment":true,
-        "periodicReportingDepartment":true,
-        "internationalDepartment":false,
-        "documentationDepartment":false,
-        "nrDepartment":false,
-        "dbDepartment":true
+        "isadmin": false,
+        "monitoring_specialist": false,
+        "monitoring_responsible": 1,
+        "Departments": {
+            "educationDepartment": true,
+            "sourceTrackingDepartment": true,
+            "periodicReportingDepartment": true,
+            "internationalDepartment": false,
+            "documentationDepartment": false,
+            "nrDepartment": false,
+            "dbDepartment": true
         }
     }

@@ -34,7 +34,7 @@ func (r *UserRepository) Create(u *model.User) error {
 func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 	u := &model.User{}
 	if err := r.store.db.QueryRow(
-		"SELECT id, email, encrypted_password, isadmin, username, seccondname, educationDepartment, sourceTrackingDepartment,periodicReportingDepartment, internationalDepartment ,documentationDepartment, nrDepartment, dbDepartment FROM users WHERE email = $1",
+		"SELECT id, email, encrypted_password, isadmin, username, seccondname, educationDepartment, sourceTrackingDepartment,periodicReportingDepartment, internationalDepartment ,documentationDepartment, nrDepartment, dbDepartment, monitoringspecialist,monitoringresponsible FROM users WHERE email = $1",
 		email,
 	).Scan(
 		&u.ID,
@@ -50,6 +50,8 @@ func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 		&u.Department.DocumentationDepartment,
 		&u.Department.NrDepartment,
 		&u.Department.DbDepartment,
+		&u.MonitoringSpecialist,
+		&u.MonitoringResponsible,
 	); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, store.ErrRecordNotFound
@@ -122,7 +124,7 @@ func (r *UserRepository) DepartmentCondition(email string) (*model.User, error) 
 
 	u := &model.User{}
 	if err := r.store.db.QueryRow(
-		"SELECT educationDepartment, sourceTrackingDepartment,periodicReportingDepartment, internationalDepartment ,documentationDepartment, nrDepartment, dbDepartment FROM users WHERE email = $1",
+		"SELECT educationDepartment, sourceTrackingDepartment,periodicReportingDepartment, internationalDepartment ,documentationDepartment, nrDepartment, dbDepartment, monitoringspecialist,monitoringresponsible FROM users WHERE email = $1",
 		email,
 	).Scan(
 		&u.Department.EducationDepartment,
@@ -132,6 +134,8 @@ func (r *UserRepository) DepartmentCondition(email string) (*model.User, error) 
 		&u.Department.DocumentationDepartment,
 		&u.Department.NrDepartment,
 		&u.Department.DbDepartment,
+		&u.MonitoringSpecialist,
+		&u.MonitoringResponsible,
 	); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, store.ErrRecordNotFound
@@ -149,11 +153,25 @@ func (r *UserRepository) DepartmentCondition(email string) (*model.User, error) 
 
 //Обновляет  данные об отелах пользователя чья почта передана первым аргументом
 
-func (r *UserRepository) DepartmentUpdate(email string, name string, seccondname string, educationDepartment bool, sourceTrackingDepartment bool, periodicReportingDepartment bool, internationalDepartment bool, documentationDepartment bool, nrDepartment bool, dbDepartment bool, isadmin bool) (*model.User, error) {
+func (r *UserRepository) DepartmentUpdate(
+	email string,
+	name string,
+	seccondname string,
+	educationDepartment bool,
+	sourceTrackingDepartment bool,
+	periodicReportingDepartment bool,
+	internationalDepartment bool,
+	documentationDepartment bool,
+	nrDepartment bool,
+	dbDepartment bool,
+	isadmin bool,
+	monitoringSpecialist bool,
+	monitoringResponsible int,
+) (*model.User, error) {
 
 	u := &model.User{}
 	if err := r.store.db.QueryRow(
-		"UPDATE users SET educationDepartment = $1, sourceTrackingDepartment = $2, periodicReportingDepartment = $3, internationalDepartment = $4, documentationDepartment = $5, nrDepartment = $6, dbDepartment = $7, isadmin = $9, username = $10 , seccondname = $11  WHERE email = $8 RETURNING  isadmin,educationDepartment,sourceTrackingDepartment,periodicReportingDepartment,internationalDepartment,documentationDepartment,nrDepartment,dbDepartment ",
+		"UPDATE users SET educationDepartment = $1, sourceTrackingDepartment = $2, periodicReportingDepartment = $3, internationalDepartment = $4, documentationDepartment = $5, nrDepartment = $6, dbDepartment = $7, isadmin = $9, username = $10 , seccondname = $11,monitoringspecialist = $12,monitoringresponsible = $13  WHERE email = $8 RETURNING  isadmin,educationDepartment,sourceTrackingDepartment,periodicReportingDepartment,internationalDepartment,documentationDepartment,nrDepartment,dbDepartment,monitoringspecialist,monitoringresponsible",
 		educationDepartment,
 		sourceTrackingDepartment,
 		periodicReportingDepartment,
@@ -165,6 +183,8 @@ func (r *UserRepository) DepartmentUpdate(email string, name string, seccondname
 		isadmin,
 		name,
 		seccondname,
+		monitoringSpecialist,
+		monitoringResponsible,
 	).Scan(
 		&u.Department.EducationDepartment,
 		&u.Department.SourceTrackingDepartment,
@@ -174,6 +194,8 @@ func (r *UserRepository) DepartmentUpdate(email string, name string, seccondname
 		&u.Department.NrDepartment,
 		&u.Department.DbDepartment,
 		&u.Isadmin,
+		&u.MonitoringSpecialist,
+		&u.MonitoringResponsible,
 	); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, store.ErrRecordNotFound

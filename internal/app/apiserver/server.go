@@ -56,12 +56,14 @@ func (s *server) configureRouter() {
 
 func (s *server) handleUsersCreate() http.HandlerFunc {
 	type request struct {
-		Email       string           `json:"email"`
-		IsAdmin     bool             `json:"isadmin"`
-		Password    string           `json:"password"`
-		Name        string           `json:"name"`
-		SeccondName string           `json:"seccondName"`
-		Departments model.Department `json:"Departments"`
+		Email                 string           `json:"email"`
+		IsAdmin               bool             `json:"isadmin"`
+		Password              string           `json:"password"`
+		Name                  string           `json:"name"`
+		SeccondName           string           `json:"seccondName"`
+		Departments           model.Department `json:"Departments"`
+		MonitoringSpecialist  bool             `json:"monitoring_specialist"`
+		MonitoringResponsible int              `json:"monitoring_responsible"`
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
 		req := &request{}
@@ -82,7 +84,8 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 			return
 		}
 		u.Sanitize()
-		_, err := s.store.User().DepartmentUpdate(req.Email,
+		_, err := s.store.User().DepartmentUpdate(
+			req.Email,
 			req.Name, req.SeccondName,
 			req.Departments.EducationDepartment,
 			req.Departments.SourceTrackingDepartment,
@@ -91,7 +94,10 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 			req.Departments.DocumentationDepartment,
 			req.Departments.NrDepartment,
 			req.Departments.DbDepartment,
-			req.IsAdmin)
+			req.IsAdmin,
+			req.MonitoringSpecialist,
+			req.MonitoringResponsible,
+		)
 		if err != nil {
 			//fmt.Println("тут")
 			s.error(w, r, http.StatusBadRequest, err)
@@ -253,7 +259,9 @@ func (s *server) handleDepartmentCondition() http.HandlerFunc {
 			return
 		}
 		type resp struct {
-			Departments model.Department
+			Departments           model.Department
+			MonitoringSpecialist  bool `json:"monitoring_specialist"`
+			MonitoringResponsible int  `json:"monitoring_responsible"`
 		}
 		res := &resp{}
 		res.Departments.EducationDepartment = u.Department.EducationDepartment
@@ -263,6 +271,8 @@ func (s *server) handleDepartmentCondition() http.HandlerFunc {
 		res.Departments.DocumentationDepartment = u.Department.DocumentationDepartment
 		res.Departments.NrDepartment = u.Department.NrDepartment
 		res.Departments.DbDepartment = u.Department.DbDepartment
+		res.MonitoringSpecialist = u.MonitoringSpecialist
+		res.MonitoringResponsible = u.MonitoringResponsible
 		s.respond(w, r, http.StatusOK, res)
 		s.logger.Infof("handle /departmentCondition, status :%d", http.StatusOK)
 	}
@@ -271,11 +281,13 @@ func (s *server) handleDepartmentCondition() http.HandlerFunc {
 func (s *server) handleUserUpdate() http.HandlerFunc {
 
 	type request struct {
-		Email       string           `json:"email"`
-		Name        string           `json:"name"`
-		SeccondName string           `json:"seccondName"`
-		IsAdmin     bool             `json:"isadmin"`
-		Departments model.Department `json:"Departments"`
+		Email                 string           `json:"email"`
+		Name                  string           `json:"name"`
+		SeccondName           string           `json:"seccondName"`
+		IsAdmin               bool             `json:"isadmin"`
+		Departments           model.Department `json:"Departments"`
+		MonitoringSpecialist  bool             `json:"monitoring_specialist"`
+		MonitoringResponsible int              `json:"monitoring_responsible"`
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
 
@@ -294,15 +306,19 @@ func (s *server) handleUserUpdate() http.HandlerFunc {
 			req.Departments.DocumentationDepartment,
 			req.Departments.NrDepartment,
 			req.Departments.DbDepartment,
-			req.IsAdmin)
+			req.IsAdmin,
+			req.MonitoringSpecialist,
+			req.MonitoringResponsible)
 		if err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
 			s.logger.Warningf("handle /userUpdate, status :%d, error :%e", http.StatusBadRequest, err)
 			return
 		}
 		type resp struct {
-			IsAdmin     bool             `json:"isadmin"`
-			Departments model.Department `json:"Departments"`
+			IsAdmin               bool             `json:"isadmin"`
+			Departments           model.Department `json:"Departments"`
+			MonitoringSpecialist  bool             `json:"monitoring_specialist"`
+			MonitoringResponsible int              `json:"monitoring_responsible"`
 		}
 		res := &resp{}
 		res.IsAdmin = u.Isadmin
@@ -313,6 +329,9 @@ func (s *server) handleUserUpdate() http.HandlerFunc {
 		res.Departments.DocumentationDepartment = u.Department.DocumentationDepartment
 		res.Departments.NrDepartment = u.Department.NrDepartment
 		res.Departments.DbDepartment = u.Department.DbDepartment
+		res.MonitoringSpecialist = u.MonitoringSpecialist
+		res.MonitoringResponsible = u.MonitoringResponsible
+
 		s.respond(w, r, http.StatusOK, res)
 		s.logger.Infof("handle /userUpdate, status :%d", http.StatusOK)
 	}

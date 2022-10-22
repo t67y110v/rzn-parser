@@ -7,14 +7,16 @@ import (
 )
 
 type User struct {
-	ID                int    `json:"id"`
-	Email             string `json:"email"`
-	Name              string `json:"name"`
-	SeccondName       string `json:"seccondName"`
-	Password          string `json:"password,omitempty"`
-	Isadmin           bool   `json:"isadmin"`
-	EncryptedPassword string `json:"-"`
-	Department        struct {
+	ID                    int    `json:"id"`
+	Email                 string `json:"email"`
+	Name                  string `json:"name"`
+	SeccondName           string `json:"seccondName"`
+	Password              string `json:"password,omitempty"`
+	Isadmin               bool   `json:"isadmin"`
+	EncryptedPassword     string `json:"-"`
+	MonitoringSpecialist  bool   `json:"monitoring_specialist"`
+	MonitoringResponsible int    `json:"monitoring_responsible"`
+	Department            struct {
 		EducationDepartment         bool `json:"educationDepartment"`
 		SourceTrackingDepartment    bool `json:"sourceTrackingDepartment"`
 		PeriodicReportingDepartment bool `json:"periodicReportingDepartment"`

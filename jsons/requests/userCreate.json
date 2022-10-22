@@ -12,5 +12,6 @@
     "nrDepartment" : true ,
     "dbDepartment" : false
     },
-    "isadmin" : true
+    "isadmin" : true,   "monitoring_specialist" : false,
+    "monitoring_responsible" : 1
   }

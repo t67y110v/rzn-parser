@@ -11,7 +11,9 @@ CREATE TABLE users (
   internationaldepartment boolean DEFAULT false,
   documentationdepartment boolean DEFAULT false,
   nrdepartment boolean DEFAULT false,
-  dbdepartment boolean DEFAULT false
+  dbdepartment boolean DEFAULT false, 
+  monitoringspecialist boolean DEFAULT false,
+  monitoringresponsible int
 );
 
 CREATE TABLE apilogs(

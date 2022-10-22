@@ -90,7 +90,7 @@ func TestUserReposytory_DepartmentUpdate(t *testing.T) {
 	s.User().Create(u)
 	u.Department.EducationDepartment = false
 	u.Department.DbDepartment = true
-	u, err = s.User().DepartmentUpdate(u.Email, u.Name, u.SeccondName, true, true, true, false, false, false, false, false)
+	u, err = s.User().DepartmentUpdate(u.Email, u.Name, u.SeccondName, true, true, true, false, false, false, false, false, false, 1)
 	assert.NoError(t, err)
 	assert.Equal(t, u.Department.EducationDepartment, true)
 	assert.Equal(t, u.Department.DbDepartment, false)

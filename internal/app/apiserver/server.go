@@ -136,7 +136,7 @@ func (s *server) handleSessionsCreate() http.HandlerFunc {
 		u, err := s.store.User().FindByEmail(req.Email)
 		if err != nil || !u.ComparePassword(req.Password) {
 			s.error(w, r, http.StatusUnauthorized, errorIncorrectEmailOrPassword)
-			s.logger.Warningf("handle /users, status :%d, error :%e", http.StatusUnauthorized, errorIncorrectEmailOrPassword)
+			s.logger.Warningf("handle /sessions, status :%d, error :%e", http.StatusUnauthorized, err)
 			return
 		}
 		/*type resp struct {

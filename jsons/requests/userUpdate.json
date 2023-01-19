@@ -13,5 +13,5 @@
     },
     "monitoring_specialist" : false,
     "monitoring_responsible" : 1 ,
-    "isadmin" : true
+    "Role" : "admin"
   }

@@ -12,7 +12,7 @@ type User struct {
 	Name                  string `json:"name"`
 	SeccondName           string `json:"seccondName"`
 	Password              string `json:"password,omitempty"`
-	Isadmin               bool   `json:"isadmin"`
+	Role                  string `json:"role"`
 	EncryptedPassword     string `json:"-"`
 	MonitoringSpecialist  bool   `json:"monitoring_specialist"`
 	MonitoringResponsible int    `json:"monitoring_responsible"`

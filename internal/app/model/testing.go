@@ -8,7 +8,7 @@ func TestUser(t *testing.T) *User {
 		Password:    "qwerty",
 		Name:        "test",
 		SeccondName: "testSeccondName",
-		Isadmin:     false,
+		Role:        "admin",
 		//EducationDepartment:         false,
 		//SourceTrackingDepartment:    false,
 		//PeriodicReportingDepartment: false,

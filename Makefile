@@ -1,10 +1,11 @@
-.PHONY: build
+
 build:
-        go build -v ./cmd/apiserver
+    go build -v ./cmd/apiserver
 
 
-.PHONY: test
+
 test:
-        go test -v -race -timeout 30s ./ ...
+    go test -v -race -timeout 30s ./ ...
+run: 
+    go run cmd/apiserver/main.go
 
-.DEAFAULT_GOAL := build

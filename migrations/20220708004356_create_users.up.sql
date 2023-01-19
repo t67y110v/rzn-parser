@@ -1,10 +1,10 @@
-CREATE TABLE users (
+CREATE  TABLE users (
   id serial not null primary key,
   email varchar not null unique,
   encrypted_password varchar not null,
   userName varchar not null,
   seccondName varchar not null,
-  isadmin boolean DEFAULT false,
+  user_role varchar ,
   educationdepartment boolean DEFAULT false,
   sourceTrackingdepartment boolean DEFAULT false,
   periodicreportingdepartment boolean DEFAULT false,
@@ -13,7 +13,7 @@ CREATE TABLE users (
   nrdepartment boolean DEFAULT false,
   dbdepartment boolean DEFAULT false, 
   monitoringspecialist boolean DEFAULT false,
-  monitoringresponsible int not null
+  monitoringresponsible int 
 );
 
 CREATE TABLE apilogs(

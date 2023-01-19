@@ -37,10 +37,10 @@ func (r *UserRepository) UpdateRoleAdmin(email string) (*model.User, error) {
 		ID:                1,
 		Email:             "test@testtest.test",
 		Password:          "qwerty",
-		Isadmin:           false,
+		Role:              "admin",
 		EncryptedPassword: "qwerty",
 	}
-	u.Isadmin = true
+	u.Role = "admin"
 	return u, nil
 }
 
@@ -49,10 +49,10 @@ func (r *UserRepository) UpdateRoleManager(email string) (*model.User, error) {
 		ID:                1,
 		Email:             "test@testtest.test",
 		Password:          "qwerty",
-		Isadmin:           false,
+		Role:              "admin",
 		EncryptedPassword: "qwerty",
 	}
-	u.Isadmin = false
+	u.Role = "admin"
 	return u, nil
 
 }
@@ -71,7 +71,7 @@ func (r *UserRepository) DepartmentCondition(string) (*model.User, error) {
 	return u, nil
 }
 
-func (r *UserRepository) DepartmentUpdate(string, string, string, bool, bool, bool, bool, bool, bool, bool, bool, bool, int) (*model.User, error) {
+func (r *UserRepository) DepartmentUpdate(string, string, string, bool, bool, bool, bool, bool, bool, bool, string, bool, int) (*model.User, error) {
 	u := &model.User{}
 
 	if err := u.BeforeCreate(); err != nil {

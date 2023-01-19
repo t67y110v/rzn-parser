@@ -36,11 +36,11 @@ func TestUserRepository_UpdateRoleAdmin(t *testing.T) {
 	//email := "user@test.com"
 	s := teststore.New()
 	u := model.TestUser(t)
-	u.Isadmin = false
+	u.Role = "manager"
 	var err error
 	u, err = s.User().UpdateRoleAdmin(u.Email)
 	assert.NoError(t, err)
-	assert.Equal(t, u.Isadmin, true)
+	assert.Equal(t, u.Role, "admin")
 
 }
 
@@ -48,11 +48,11 @@ func TestUserRepository_UpdateRoleManager(t *testing.T) {
 	//email := "user@test.com"
 	s := teststore.New()
 	u := model.TestUser(t)
-	u.Isadmin = true
+	u.Role = "admin"
 	var err error
 	u, err = s.User().UpdateRoleManager(u.Email)
 	assert.NoError(t, err)
-	assert.Equal(t, u.Isadmin, false)
+	assert.Equal(t, u.Role, "manager")
 
 }
 
@@ -90,7 +90,7 @@ func TestUserReposytory_DepartmentUpdate(t *testing.T) {
 	s.User().Create(u)
 	u.Department.EducationDepartment = false
 	u.Department.DbDepartment = true
-	u, err = s.User().DepartmentUpdate(u.Email, u.Name, u.SeccondName, true, true, true, false, false, false, false, false, false, 1)
+	u, err = s.User().DepartmentUpdate(u.Email, u.Name, u.SeccondName, true, true, true, false, false, false, false, "manager", false, 1)
 	assert.NoError(t, err)
 	assert.Equal(t, u.Department.EducationDepartment, true)
 	assert.Equal(t, u.Department.DbDepartment, false)

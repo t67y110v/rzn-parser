@@ -1,5 +1,5 @@
     {
-        "isadmin": false,
+        "role": "admin",
         "monitoring_specialist": false,
         "monitoring_responsible": 1,
         "Departments": {

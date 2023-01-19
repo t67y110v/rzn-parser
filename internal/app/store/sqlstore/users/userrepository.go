@@ -34,13 +34,13 @@ func (r *UserRepository) Create(u *model.User) error {
 func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 	u := &model.User{}
 	if err := r.store.db.QueryRow(
-		"SELECT id, email, encrypted_password, isadmin, username, seccondname, educationDepartment, sourceTrackingDepartment,periodicReportingDepartment, internationalDepartment ,documentationDepartment, nrDepartment, dbDepartment, monitoringspecialist,monitoringresponsible FROM users WHERE email = $1",
+		"SELECT id, email, encrypted_password, user_role, username, seccondname, educationDepartment, sourceTrackingDepartment,periodicReportingDepartment, internationalDepartment ,documentationDepartment, nrDepartment, dbDepartment, monitoringspecialist,monitoringresponsible FROM users WHERE email = $1",
 		email,
 	).Scan(
 		&u.ID,
 		&u.Email,
 		&u.EncryptedPassword,
-		&u.Isadmin,
+		&u.Role,
 		&u.Name,
 		&u.SeccondName,
 		&u.Department.EducationDepartment,
@@ -68,11 +68,11 @@ func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 func (r *UserRepository) UpdateRoleAdmin(email string) (*model.User, error) {
 	u := &model.User{}
 	if err := r.store.db.QueryRow(
-		"UPDATE users SET isadmin = true, educationDepartment = true, sourceTrackingDepartment = true, periodicReportingDepartment = true, internationalDepartment = true, documentationDepartment = true, nrDepartment = true, dbDepartment = true WHERE email = $1 RETURNING id,isadmin",
+		"UPDATE users SET user_role = 'admin', educationDepartment = true, sourceTrackingDepartment = true, periodicReportingDepartment = true, internationalDepartment = true, documentationDepartment = true, nrDepartment = true, dbDepartment = true WHERE email = $1 RETURNING id,user_role",
 		email,
 	).Scan(
 		&u.ID,
-		&u.Isadmin,
+		&u.Role,
 	); err != nil {
 		return nil, err
 	}
@@ -83,11 +83,11 @@ func (r *UserRepository) UpdateRoleAdmin(email string) (*model.User, error) {
 func (r *UserRepository) UpdateRoleManager(email string) (*model.User, error) {
 	u := &model.User{}
 	if err := r.store.db.QueryRow(
-		"UPDATE users SET isadmin = false, educationDepartment = false, sourceTrackingDepartment = false, periodicReportingDepartment = false, internationalDepartment = false, documentationDepartment = false, nrDepartment = false, dbDepartment = false WHERE email = $1 RETURNING id,isadmin",
+		"UPDATE users SET user_role = 'manager', educationDepartment = false, sourceTrackingDepartment = false, periodicReportingDepartment = false, internationalDepartment = false, documentationDepartment = false, nrDepartment = false, dbDepartment = false WHERE email = $1 RETURNING id,role",
 		email,
 	).Scan(
 		&u.ID,
-		&u.Isadmin,
+		&u.Role,
 	); err != nil {
 		return nil, err
 	}
@@ -164,14 +164,14 @@ func (r *UserRepository) DepartmentUpdate(
 	documentationDepartment bool,
 	nrDepartment bool,
 	dbDepartment bool,
-	isadmin bool,
+	role string,
 	monitoringSpecialist bool,
 	monitoringResponsible int,
 ) (*model.User, error) {
 
 	u := &model.User{}
 	if err := r.store.db.QueryRow(
-		"UPDATE users SET educationDepartment = $1, sourceTrackingDepartment = $2, periodicReportingDepartment = $3, internationalDepartment = $4, documentationDepartment = $5, nrDepartment = $6, dbDepartment = $7, isadmin = $9, username = $10 , seccondname = $11,monitoringspecialist = $12,monitoringresponsible = $13  WHERE email = $8 RETURNING  isadmin,educationDepartment,sourceTrackingDepartment,periodicReportingDepartment,internationalDepartment,documentationDepartment,nrDepartment,dbDepartment,monitoringspecialist,monitoringresponsible",
+		"UPDATE users SET educationDepartment = $1, sourceTrackingDepartment = $2, periodicReportingDepartment = $3, internationalDepartment = $4, documentationDepartment = $5, nrDepartment = $6, dbDepartment = $7, user_role = $9, username = $10 , seccondname = $11,monitoringspecialist = $12,monitoringresponsible = $13  WHERE email = $8 RETURNING  user_role,educationDepartment,sourceTrackingDepartment,periodicReportingDepartment,internationalDepartment,documentationDepartment,nrDepartment,dbDepartment,monitoringspecialist,monitoringresponsible",
 		educationDepartment,
 		sourceTrackingDepartment,
 		periodicReportingDepartment,
@@ -180,12 +180,13 @@ func (r *UserRepository) DepartmentUpdate(
 		nrDepartment,
 		dbDepartment,
 		email,
-		isadmin,
+		role,
 		name,
 		seccondname,
 		monitoringSpecialist,
 		monitoringResponsible,
 	).Scan(
+		&u.Role,
 		&u.Department.EducationDepartment,
 		&u.Department.SourceTrackingDepartment,
 		&u.Department.PeriodicReportingDepartment,
@@ -193,7 +194,7 @@ func (r *UserRepository) DepartmentUpdate(
 		&u.Department.DocumentationDepartment,
 		&u.Department.NrDepartment,
 		&u.Department.DbDepartment,
-		&u.Isadmin,
+
 		&u.MonitoringSpecialist,
 		&u.MonitoringResponsible,
 	); err != nil {

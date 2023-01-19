@@ -42,10 +42,10 @@ func TestUserRepository_UpdateRoleAdmin(t *testing.T) {
 	defer teardown("users")
 	s := sqlstore.New(db)
 	u := model.TestUser(t)
-	u.Isadmin = false
+	u.Role = "manager"
 	s.User().Create(u)
 	u, err = s.User().UpdateRoleAdmin(u.Email)
-	assert.Equal(t, u.Isadmin, true)
+	assert.Equal(t, u.Role, "admin")
 	assert.NotNil(t, u)
 	assert.NoError(t, err)
 }
@@ -56,10 +56,10 @@ func TestUserRepository_UpdateRoleManager(t *testing.T) {
 	defer teardown("users")
 	s := sqlstore.New(db)
 	u := model.TestUser(t)
-	u.Isadmin = true
+	u.Role = "admin"
 	s.User().Create(u)
 	u, err = s.User().UpdateRoleManager(u.Email)
-	assert.Equal(t, u.Isadmin, false)
+	assert.Equal(t, u.Role, "manager")
 	assert.NotNil(t, u)
 	assert.NoError(t, err)
 }
@@ -109,7 +109,7 @@ func TestUserRepositoryDepartmentCondition(t *testing.T) {
 	u.Department.DocumentationDepartment = false
 	u.Department.NrDepartment = false
 	u.Department.DbDepartment = false
-	u.Isadmin = true
+	u.Role = "manager"
 	s.User().Create(u)
 	s.User().DepartmentCondition(u.Email)
 	assert.Equal(t, u.Name, "oleg")
@@ -140,8 +140,8 @@ func TestUserRepositoryDepartmentUpdate(t *testing.T) {
 	u.Department.DocumentationDepartment = false
 	u.Department.NrDepartment = false
 	u.Department.DbDepartment = false
-	u.Isadmin = true
+	u.Role = "admin"
 	s.User().Create(u)
-	_, err := s.User().DepartmentUpdate(u.Email, u.Name, u.SeccondName, false, false, false, false, false, false, false, false, false, 1)
+	_, err := s.User().DepartmentUpdate(u.Email, u.Name, u.SeccondName, false, false, false, false, false, false, false, "manager", false, 1)
 	assert.NoError(t, err)
 }

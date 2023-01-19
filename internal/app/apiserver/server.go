@@ -57,7 +57,7 @@ func (s *server) configureRouter() {
 func (s *server) handleUsersCreate() http.HandlerFunc {
 	type request struct {
 		Email                 string           `json:"email"`
-		IsAdmin               bool             `json:"isadmin"`
+		Role                  string           `json:"role"`
 		Password              string           `json:"password"`
 		Name                  string           `json:"name"`
 		SeccondName           string           `json:"seccondName"`
@@ -94,7 +94,7 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 			req.Departments.DocumentationDepartment,
 			req.Departments.NrDepartment,
 			req.Departments.DbDepartment,
-			req.IsAdmin,
+			req.Role,
 			req.MonitoringSpecialist,
 			req.MonitoringResponsible,
 		)
@@ -139,15 +139,7 @@ func (s *server) handleSessionsCreate() http.HandlerFunc {
 			s.logger.Warningf("handle /sessions, status :%d, error :%e", http.StatusUnauthorized, err)
 			return
 		}
-		/*type resp struct {
-			IsAdmin bool `json:"isAdmin"`
-		}
-		res := &resp{}
-		if u.Isadmin {
-			res.IsAdmin = true
-		} else {
-			res.IsAdmin = false
-		} */
+
 		s.respond(w, r, http.StatusOK, u)
 		s.logger.Infof("handle /sessions, status :%d", http.StatusOK)
 	}
@@ -171,13 +163,17 @@ func (s *server) handleAdminUpdate() http.HandlerFunc {
 			return
 		}
 		type resp struct {
-			IsAdmin bool `json:"isAdmin"`
+			Role string `json:"role"`
 		}
 		res := &resp{}
-		if u.Isadmin {
-			res.IsAdmin = true
-		} else {
-			res.IsAdmin = false
+		if u.Role == "manager" {
+			res.Role = "manager"
+		} else if u.Role == "admin" {
+			res.Role = "admin"
+		} else if u.Role == "reviewer" {
+			res.Role = "reviewer"
+		} else if u.Role == "writer" {
+			res.Role = "writer"
 		}
 		s.respond(w, r, http.StatusOK, res)
 		s.logger.Infof("handle /makeAdmin, status :%d", http.StatusOK)
@@ -202,13 +198,17 @@ func (s *server) handleManagerUpdate() http.HandlerFunc {
 			return
 		}
 		type resp struct {
-			IsAdmin bool `json:"isAdmin"`
+			Role string `json:"role"`
 		}
 		res := &resp{}
-		if u.Isadmin {
-			res.IsAdmin = true
-		} else {
-			res.IsAdmin = false
+		if u.Role == "admin" {
+			res.Role = "admin"
+		} else if u.Role == "manager" {
+			res.Role = "manager"
+		} else if u.Role == "reviewer" {
+			res.Role = "reviewer"
+		} else if u.Role == "writer" {
+			res.Role = "writer"
 		}
 		s.respond(w, r, http.StatusOK, res)
 		s.logger.Infof("handle /makeManager, status :%d", http.StatusOK)
@@ -284,7 +284,7 @@ func (s *server) handleUserUpdate() http.HandlerFunc {
 		Email                 string           `json:"email"`
 		Name                  string           `json:"name"`
 		SeccondName           string           `json:"seccondName"`
-		IsAdmin               bool             `json:"isadmin"`
+		Role                  string           `json:"role"`
 		Departments           model.Department `json:"Departments"`
 		MonitoringSpecialist  bool             `json:"monitoring_specialist"`
 		MonitoringResponsible int              `json:"monitoring_responsible"`
@@ -306,7 +306,7 @@ func (s *server) handleUserUpdate() http.HandlerFunc {
 			req.Departments.DocumentationDepartment,
 			req.Departments.NrDepartment,
 			req.Departments.DbDepartment,
-			req.IsAdmin,
+			req.Role,
 			req.MonitoringSpecialist,
 			req.MonitoringResponsible)
 		if err != nil {
@@ -315,13 +315,13 @@ func (s *server) handleUserUpdate() http.HandlerFunc {
 			return
 		}
 		type resp struct {
-			IsAdmin               bool             `json:"isadmin"`
+			Role                  string           `json:"role"`
 			Departments           model.Department `json:"Departments"`
 			MonitoringSpecialist  bool             `json:"monitoring_specialist"`
 			MonitoringResponsible int              `json:"monitoring_responsible"`
 		}
 		res := &resp{}
-		res.IsAdmin = u.Isadmin
+		res.Role = u.Role
 		res.Departments.EducationDepartment = u.Department.EducationDepartment
 		res.Departments.SourceTrackingDepartment = u.Department.SourceTrackingDepartment
 		res.Departments.PeriodicReportingDepartment = u.Department.PeriodicReportingDepartment

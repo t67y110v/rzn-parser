@@ -21,7 +21,7 @@ func (r *UserRepository) Create(u *model.User) error {
 	}
 
 	return r.store.db.QueryRow(
-		"INSERT INTO users (email, encrypted_password, userName, seccondName) VALUES ($1, $2,$3,$4) RETURNING id",
+		"INSERT INTO users (email, encrypted_password, user_name, seccond_name) VALUES ($1, $2,$3,$4) RETURNING id",
 		u.Email,
 		u.EncryptedPassword,
 		u.Name,
@@ -34,7 +34,7 @@ func (r *UserRepository) Create(u *model.User) error {
 func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 	u := &model.User{}
 	if err := r.store.db.QueryRow(
-		"SELECT id, email, encrypted_password, user_role, username, seccondname, educationDepartment, sourceTrackingDepartment,periodicReportingDepartment, internationalDepartment ,documentationDepartment, nrDepartment, dbDepartment, monitoringspecialist,monitoringresponsible FROM users WHERE email = $1",
+		"SELECT id, email, encrypted_password, user_role, user_name, seccond_name, education_department, source_tracking_department,periodic_reporting_department, international_department ,documentation_department, nr_department, db_department, monitoring_specialist,monitoring_responsible FROM users WHERE email = $1",
 		email,
 	).Scan(
 		&u.ID,
@@ -68,7 +68,7 @@ func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 func (r *UserRepository) UpdateRoleAdmin(email string) (*model.User, error) {
 	u := &model.User{}
 	if err := r.store.db.QueryRow(
-		"UPDATE users SET user_role = 'admin', educationDepartment = true, sourceTrackingDepartment = true, periodicReportingDepartment = true, internationalDepartment = true, documentationDepartment = true, nrDepartment = true, dbDepartment = true WHERE email = $1 RETURNING id,user_role",
+		"UPDATE users SET user_role = 'admin', education_department = true, source_tracking_department = true, periodic_reporting_department = true, international_department = true, documentation_department = true, nr_department = true, db_department = true WHERE email = $1 RETURNING id,user_role",
 		email,
 	).Scan(
 		&u.ID,
@@ -83,7 +83,7 @@ func (r *UserRepository) UpdateRoleAdmin(email string) (*model.User, error) {
 func (r *UserRepository) UpdateRoleManager(email string) (*model.User, error) {
 	u := &model.User{}
 	if err := r.store.db.QueryRow(
-		"UPDATE users SET user_role = 'manager', educationDepartment = false, sourceTrackingDepartment = false, periodicReportingDepartment = false, internationalDepartment = false, documentationDepartment = false, nrDepartment = false, dbDepartment = false WHERE email = $1 RETURNING id,role",
+		"UPDATE users SET user_role = 'manager', education_department = false, source_tracking_department = false, periodic_reporting_department = false, international_department = false, documentation_department = false, nr_department = false, db_department = false WHERE email = $1 RETURNING id,role",
 		email,
 	).Scan(
 		&u.ID,
@@ -112,7 +112,7 @@ func (r *UserRepository) ChangePassword(u *model.User) error {
 
 func (r *UserRepository) UpdateEducationDepartment(u *model.User, educationDepartment bool) error {
 	return r.store.db.QueryRow(
-		"UPDATE users SET educationDepartment = $1 WHERE email = $2 RETURNING ID",
+		"UPDATE users SET education_department = $1 WHERE email = $2 RETURNING ID",
 		educationDepartment,
 		u.Email,
 	).Scan(&u.ID)
@@ -124,7 +124,7 @@ func (r *UserRepository) DepartmentCondition(email string) (*model.User, error) 
 
 	u := &model.User{}
 	if err := r.store.db.QueryRow(
-		"SELECT educationDepartment, sourceTrackingDepartment,periodicReportingDepartment, internationalDepartment ,documentationDepartment, nrDepartment, dbDepartment, monitoringspecialist,monitoringresponsible FROM users WHERE email = $1",
+		"SELECT education_department, source_tracking_department,periodic_reporting_department, international_department ,documentation_department, nr_department, db_department, monitoring_specialist,monitoring_responsible FROM users WHERE email = $1",
 		email,
 	).Scan(
 		&u.Department.EducationDepartment,
@@ -171,7 +171,7 @@ func (r *UserRepository) DepartmentUpdate(
 
 	u := &model.User{}
 	if err := r.store.db.QueryRow(
-		"UPDATE users SET educationDepartment = $1, sourceTrackingDepartment = $2, periodicReportingDepartment = $3, internationalDepartment = $4, documentationDepartment = $5, nrDepartment = $6, dbDepartment = $7, user_role = $9, username = $10 , seccondname = $11,monitoringspecialist = $12,monitoringresponsible = $13  WHERE email = $8 RETURNING  user_role,educationDepartment,sourceTrackingDepartment,periodicReportingDepartment,internationalDepartment,documentationDepartment,nrDepartment,dbDepartment,monitoringspecialist,monitoringresponsible",
+		"UPDATE users SET education_department = $1, source_tracking_department = $2, periodic_reporting_department = $3, international_department = $4, documentation_department = $5, nr_department = $6, db_department = $7, user_role = $9, user_name = $10 , seccond_name = $11,monitoring_specialist = $12,monitoring_responsible = $13  WHERE email = $8 RETURNING  user_role,education_department,source_tracking_department,periodic_reporting_department,international_department,documentation_department,nr_department,db_department,monitoring_specialist,monitoring_responsible",
 		educationDepartment,
 		sourceTrackingDepartment,
 		periodicReportingDepartment,

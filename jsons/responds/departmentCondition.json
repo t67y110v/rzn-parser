@@ -1,12 +1,12 @@
 {
-    "Departments": {
-        "educationDepartment": true,
-        "sourceTrackingDepartment": true,
-        "periodicReportingDepartment": true,
-        "internationalDepartment": true,
-        "documentationDepartment": true,
-        "nrDepartment": true,
-        "dbDepartment": true
+    "departments": {
+        "education_department": true,
+        "source_tracking_department": true,
+        "periodic_reporting_department": true,
+        "international_department": true,
+        "documentation_department": true,
+        "nr_department": true,
+        "db_department": true
     },
     "monitoring_specialist": false,
     "monitoring_responsible": 1

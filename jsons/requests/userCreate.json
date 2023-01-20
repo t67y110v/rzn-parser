@@ -2,15 +2,15 @@
     "email": "example@mail.ru",
     "password" : "eXaMpLe123" ,
     "name" : "exampleName",
-    "seccondName" : "exampleSeccondName",
-    "Departments" : {
-    "educationDepartment" : true,
-    "sourceTrackingDepartment" : true , 
-    "periodicReportingDepartment" : false ,
-    "internationalDepartment" : false ,
-    "documentationDepartment" : false , 
-    "nrDepartment" : true ,
-    "dbDepartment" : false
+    "seccond_name" : "exampleSeccondName",
+    "departments" : {
+    "education_department" : true,
+    "source_tracking_department" : true , 
+    "periodic_reporting_department" : false ,
+    "international_department" : false ,
+    "documentation_department" : false , 
+    "nr_department" : true ,
+    "db_department" : false
     },
     "role" : "admin",   "monitoring_specialist" : false,
     "monitoring_responsible" : 1

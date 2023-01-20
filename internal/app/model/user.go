@@ -10,20 +10,20 @@ type User struct {
 	ID                    int    `json:"id"`
 	Email                 string `json:"email"`
 	Name                  string `json:"name"`
-	SeccondName           string `json:"seccondName"`
+	SeccondName           string `json:"seccond_name"`
 	Password              string `json:"password,omitempty"`
 	Role                  string `json:"role"`
 	EncryptedPassword     string `json:"-"`
 	MonitoringSpecialist  bool   `json:"monitoring_specialist"`
 	MonitoringResponsible int    `json:"monitoring_responsible"`
 	Department            struct {
-		EducationDepartment         bool `json:"educationDepartment"`
-		SourceTrackingDepartment    bool `json:"sourceTrackingDepartment"`
-		PeriodicReportingDepartment bool `json:"periodicReportingDepartment"`
-		InternationalDepartment     bool `json:"internationalDepartment"`
-		DocumentationDepartment     bool `json:"documentationDepartment"`
-		NrDepartment                bool `json:"nrDepartment"`
-		DbDepartment                bool `json:"dbDepartment"`
+		EducationDepartment         bool `json:"education_department"`
+		SourceTrackingDepartment    bool `json:"source_tracking_department"`
+		PeriodicReportingDepartment bool `json:"periodic_reporting_department"`
+		InternationalDepartment     bool `json:"international_department"`
+		DocumentationDepartment     bool `json:"documentation_department"`
+		NrDepartment                bool `json:"nr_department"`
+		DbDepartment                bool `json:"db_department"`
 	}
 }
 

@@ -2,17 +2,17 @@
     "id": 1,
     "email": "example@mail.ru",
     "name": "exampleName",
-    "seccondName": "exampleSeccondName",
+    "seccond_name": "exampleSeccondName",
     "role": "admin",
     "monitoring_specialist": false,
     "monitoring_responsible": 1,
     "Department": {
-        "educationDepartment": true,
-        "sourceTrackingDepartment": true,
-        "periodicReportingDepartment": false,
-        "internationalDepartment": false,
-        "documentationDepartment": false,
-        "nrDepartment": true,
-        "dbDepartment": false
+        "education_department": true,
+        "source_tracking_department": true,
+        "periodic_reporting_department": false,
+        "international_department": false,
+        "documentation_department": false,
+        "nr_department": true,
+        "db_department": false
     }
 }

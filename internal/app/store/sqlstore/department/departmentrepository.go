@@ -12,7 +12,7 @@ type DepartmentRepositor struct {
 func (r *DepartmentRepositor) NrDepartmentAddNewPosition(d *model.NrDepartment) error {
 
 	return r.store.db.QueryRow(
-		"INSERT INTO nrdepartment (date, time, userName, seccondName) VALUES ($1, $2,$3,$4) RETURNING id",
+		"INSERT INTO nr_department (date, time, user_name, seccond_name) VALUES ($1, $2,$3,$4) RETURNING id",
 		d.Date,
 		d.Time,
 		d.Day0,

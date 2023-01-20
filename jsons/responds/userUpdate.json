@@ -2,13 +2,13 @@
         "role": "admin",
         "monitoring_specialist": false,
         "monitoring_responsible": 1,
-        "Departments": {
-            "educationDepartment": true,
-            "sourceTrackingDepartment": true,
-            "periodicReportingDepartment": true,
-            "internationalDepartment": false,
-            "documentationDepartment": false,
-            "nrDepartment": false,
-            "dbDepartment": true
+        "departments": {
+            "education_department": true,
+            "source_tracking_department": true,
+            "periodic_reporting_department": true,
+            "international_department": false,
+            "documentation_department": false,
+            "nr_department": false,
+            "db_department": true
         }
     }

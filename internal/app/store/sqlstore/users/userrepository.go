@@ -84,7 +84,7 @@ func (r *UserRepository) UpdateRoleAdmin(email string) (*model.User, error) {
 func (r *UserRepository) UpdateRoleManager(email string) (*model.User, error) {
 	u := &model.User{}
 	if err := r.store.db.QueryRow(
-		"UPDATE users SET user_role = 'manager', education_department = false, source_tracking_department = false, periodic_reporting_department = false, international_department = false, documentation_department = false, nr_department = false, db_department = false WHERE email = $1 RETURNING id,role",
+		"UPDATE users SET user_role = 'manager', education_department = false, source_tracking_department = false, periodic_reporting_department = false, international_department = false, documentation_department = false, nr_department = false, db_department = false WHERE email = $1 RETURNING id,user_role",
 		email,
 	).Scan(
 		&u.ID,

@@ -4,6 +4,7 @@
     "name" : "exampleName",
     "seccond_name" : "exampleSeccondName",
     "departments" : {
+    "client_department" : false,
     "education_department" : true,
     "source_tracking_department" : true , 
     "periodic_reporting_department" : false ,
@@ -12,6 +13,6 @@
     "nr_department" : true ,
     "db_department" : false
     },
-    "role" : "admin",   "monitoring_specialist" : false,
+    "user_role" : "admin",   "monitoring_specialist" : false,
     "monitoring_responsible" : 1
   }

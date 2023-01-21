@@ -116,7 +116,7 @@ func (s *Server) handleAdminUpdate() http.HandlerFunc {
 			return
 		}
 		type resp struct {
-			Role string `json:"role"`
+			Role string `json:"user_role"`
 		}
 		res := &resp{}
 		if u.Role == "manager" {
@@ -151,7 +151,7 @@ func (s *Server) handleManagerUpdate() http.HandlerFunc {
 			return
 		}
 		type resp struct {
-			Role string `json:"role"`
+			Role string `json:"user_role"`
 		}
 		res := &resp{}
 		if u.Role == "admin" {
@@ -201,7 +201,7 @@ func (s *Server) handleUserUpdate() http.HandlerFunc {
 		Email                 string           `json:"email"`
 		Name                  string           `json:"name"`
 		SeccondName           string           `json:"seccond_name"`
-		Role                  string           `json:"role"`
+		Role                  string           `json:"user_role"`
 		Departments           model.Department `json:"departments"`
 		MonitoringSpecialist  bool             `json:"monitoring_specialist"`
 		MonitoringResponsible int              `json:"monitoring_responsible"`
@@ -234,7 +234,7 @@ func (s *Server) handleUserUpdate() http.HandlerFunc {
 			return
 		}
 		type resp struct {
-			Role                  string           `json:"role"`
+			Role                  string           `json:"user_role"`
 			Departments           model.Department `json:"departments"`
 			MonitoringSpecialist  bool             `json:"monitoring_specialist"`
 			MonitoringResponsible int              `json:"monitoring_responsible"`

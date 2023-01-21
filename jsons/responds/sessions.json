@@ -3,10 +3,11 @@
     "email": "example@mail.ru",
     "name": "exampleName",
     "seccond_name": "exampleSeccondName",
-    "role": "admin",
+    "user_role": "admin",
     "monitoring_specialist": false,
     "monitoring_responsible": 1,
-    "Department": {
+    "department": {
+        "client_department" : false,
         "education_department": true,
         "source_tracking_department": true,
         "periodic_reporting_department": false,

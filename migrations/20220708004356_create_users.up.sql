@@ -5,6 +5,7 @@ CREATE  TABLE users (
   user_name varchar not null,
   seccond_name varchar not null,
   user_role varchar ,
+  client_department boolean DEFAULT false , 
   education_department boolean DEFAULT false,
   source_tracking_department boolean DEFAULT false,
   periodic_reporting_department boolean DEFAULT false,
@@ -16,13 +17,3 @@ CREATE  TABLE users (
   monitoring_responsible int 
 );
 
-CREATE TABLE apilogs(
-  request_id serial not null primary key,
-  remote_ip varchar,
-  method varchar,
-  request_url varchar not null ,
-  resp_status varchar not null ,
-  duration varchar not null ,
-  request_time varchar not null ,
-  request_message varchar not null, 
-)

@@ -9,7 +9,7 @@ import (
 func (s *Server) handleUsersCreate() http.HandlerFunc {
 	type request struct {
 		Email                 string           `json:"email"`
-		Role                  string           `json:"role"`
+		Role                  string           `json:"user_role"`
 		Password              string           `json:"password"`
 		Name                  string           `json:"name"`
 		SeccondName           string           `json:"seccond_name"`
@@ -38,7 +38,9 @@ func (s *Server) handleUsersCreate() http.HandlerFunc {
 		u.Sanitize()
 		_, err := s.store.User().DepartmentUpdate(
 			req.Email,
-			req.Name, req.SeccondName,
+			req.Name,
+			req.SeccondName,
+			req.Departments.ClientDepartment,
 			req.Departments.EducationDepartment,
 			req.Departments.SourceTrackingDepartment,
 			req.Departments.PeriodicReportingDepartment,
@@ -213,7 +215,9 @@ func (s *Server) handleUserUpdate() http.HandlerFunc {
 			return
 		}
 		u, err := s.store.User().DepartmentUpdate(req.Email,
-			req.Name, req.SeccondName,
+			req.Name,
+			req.SeccondName,
+			req.Departments.EducationDepartment,
 			req.Departments.EducationDepartment,
 			req.Departments.SourceTrackingDepartment,
 			req.Departments.PeriodicReportingDepartment,
@@ -237,6 +241,7 @@ func (s *Server) handleUserUpdate() http.HandlerFunc {
 		}
 		res := &resp{}
 		res.Role = u.Role
+		res.Departments.ClientDepartment = u.Department.ClientDepartment
 		res.Departments.EducationDepartment = u.Department.EducationDepartment
 		res.Departments.SourceTrackingDepartment = u.Department.SourceTrackingDepartment
 		res.Departments.PeriodicReportingDepartment = u.Department.PeriodicReportingDepartment

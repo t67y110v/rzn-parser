@@ -17,6 +17,7 @@ type User struct {
 	MonitoringSpecialist  bool   `json:"monitoring_specialist"`
 	MonitoringResponsible int    `json:"monitoring_responsible"`
 	Department            struct {
+		ClientDepartment            bool `json:"client_department"`
 		EducationDepartment         bool `json:"education_department"`
 		SourceTrackingDepartment    bool `json:"source_tracking_department"`
 		PeriodicReportingDepartment bool `json:"periodic_reporting_department"`

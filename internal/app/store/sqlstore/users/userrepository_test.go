@@ -142,6 +142,6 @@ func TestUserRepositoryDepartmentUpdate(t *testing.T) {
 	u.Department.DbDepartment = false
 	u.Role = "admin"
 	s.User().Create(u)
-	_, err := s.User().DepartmentUpdate(u.Email, u.Name, u.SeccondName, false, false, false, false, false, false, false, "manager", false, 1)
+	_, err := s.User().DepartmentUpdate(u.Email, u.Name, u.SeccondName, false, false, false, false, false, false, false, false, "manager", false, 1)
 	assert.NoError(t, err)
 }

@@ -34,7 +34,7 @@ func (r *UserRepository) Create(u *model.User) error {
 func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 	u := &model.User{}
 	if err := r.store.db.QueryRow(
-		"SELECT id, email, encrypted_password, user_role, user_name, seccond_name, education_department, source_tracking_department,periodic_reporting_department, international_department ,documentation_department, nr_department, db_department, monitoring_specialist,monitoring_responsible FROM users WHERE email = $1",
+		"SELECT id, email, encrypted_password, user_role, user_name, seccond_name,client_department,  education_department, source_tracking_department,periodic_reporting_department, international_department ,documentation_department, nr_department, db_department, monitoring_specialist,monitoring_responsible FROM users WHERE email = $1",
 		email,
 	).Scan(
 		&u.ID,
@@ -43,6 +43,7 @@ func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 		&u.Role,
 		&u.Name,
 		&u.SeccondName,
+		&u.Department.ClientDepartment,
 		&u.Department.EducationDepartment,
 		&u.Department.SourceTrackingDepartment,
 		&u.Department.PeriodicReportingDepartment,
@@ -157,6 +158,7 @@ func (r *UserRepository) DepartmentUpdate(
 	email string,
 	name string,
 	seccondname string,
+	clientDepartment bool,
 	educationDepartment bool,
 	sourceTrackingDepartment bool,
 	periodicReportingDepartment bool,
@@ -171,7 +173,8 @@ func (r *UserRepository) DepartmentUpdate(
 
 	u := &model.User{}
 	if err := r.store.db.QueryRow(
-		"UPDATE users SET education_department = $1, source_tracking_department = $2, periodic_reporting_department = $3, international_department = $4, documentation_department = $5, nr_department = $6, db_department = $7, user_role = $9, user_name = $10 , seccond_name = $11,monitoring_specialist = $12,monitoring_responsible = $13  WHERE email = $8 RETURNING  user_role,education_department,source_tracking_department,periodic_reporting_department,international_department,documentation_department,nr_department,db_department,monitoring_specialist,monitoring_responsible",
+		"UPDATE users SET  client_department = $1,  education_department = $2, source_tracking_department = $3, periodic_reporting_department = $4, international_department = $5, documentation_department = $6, nr_department = $7, db_department = $8, user_role = $9, user_name = $10 , seccond_name = $11,monitoring_specialist = $12,monitoring_responsible = $13  WHERE email = $14 RETURNING  user_role,education_department,source_tracking_department,periodic_reporting_department,international_department,documentation_department,nr_department,db_department,monitoring_specialist,monitoring_responsible, client_department",
+		clientDepartment,
 		educationDepartment,
 		sourceTrackingDepartment,
 		periodicReportingDepartment,
@@ -179,12 +182,12 @@ func (r *UserRepository) DepartmentUpdate(
 		documentationDepartment,
 		nrDepartment,
 		dbDepartment,
-		email,
 		role,
 		name,
 		seccondname,
 		monitoringSpecialist,
 		monitoringResponsible,
+		email,
 	).Scan(
 		&u.Role,
 		&u.Department.EducationDepartment,
@@ -194,9 +197,9 @@ func (r *UserRepository) DepartmentUpdate(
 		&u.Department.DocumentationDepartment,
 		&u.Department.NrDepartment,
 		&u.Department.DbDepartment,
-
 		&u.MonitoringSpecialist,
 		&u.MonitoringResponsible,
+		&u.Department.ClientDepartment,
 	); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, store.ErrRecordNotFound

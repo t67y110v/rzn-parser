@@ -28,6 +28,7 @@ func (s *Server) handleDepartmentCondition() http.HandlerFunc {
 			MonitoringResponsible int  `json:"monitoring_responsible"`
 		}
 		res := &resp{}
+		res.Departments.ClientDepartment = u.Department.ClientDepartment
 		res.Departments.EducationDepartment = u.Department.EducationDepartment
 		res.Departments.SourceTrackingDepartment = u.Department.SourceTrackingDepartment
 		res.Departments.PeriodicReportingDepartment = u.Department.PeriodicReportingDepartment

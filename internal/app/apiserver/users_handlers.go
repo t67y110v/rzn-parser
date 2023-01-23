@@ -217,7 +217,7 @@ func (s *Server) handleUserUpdate() http.HandlerFunc {
 		u, err := s.store.User().DepartmentUpdate(req.Email,
 			req.Name,
 			req.SeccondName,
-			req.Departments.EducationDepartment,
+			req.Departments.ClientDepartment,
 			req.Departments.EducationDepartment,
 			req.Departments.SourceTrackingDepartment,
 			req.Departments.PeriodicReportingDepartment,

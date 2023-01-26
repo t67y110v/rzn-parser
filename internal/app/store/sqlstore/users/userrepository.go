@@ -66,36 +66,6 @@ func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 
 //обновление роли пользователя по почте
 
-func (r *UserRepository) UpdateRoleAdmin(email string) (*model.User, error) {
-	u := &model.User{}
-	if err := r.store.db.QueryRow(
-		"UPDATE users SET user_role = 'admin', education_department = true, source_tracking_department = true, periodic_reporting_department = true, international_department = true, documentation_department = true, nr_department = true, db_department = true WHERE email = $1 RETURNING id,user_role",
-		email,
-	).Scan(
-		&u.ID,
-		&u.Role,
-	); err != nil {
-		return nil, err
-	}
-
-	u.Email = email
-	return u, nil
-}
-func (r *UserRepository) UpdateRoleManager(email string) (*model.User, error) {
-	u := &model.User{}
-	if err := r.store.db.QueryRow(
-		"UPDATE users SET user_role = 'manager', education_department = false, source_tracking_department = false, periodic_reporting_department = false, international_department = false, documentation_department = false, nr_department = false, db_department = false WHERE email = $1 RETURNING id,user_role",
-		email,
-	).Scan(
-		&u.ID,
-		&u.Role,
-	); err != nil {
-		return nil, err
-	}
-	u.Email = email
-	return u, nil
-}
-
 //Смена пароля пользователя
 
 func (r *UserRepository) ChangePassword(u *model.User) error {

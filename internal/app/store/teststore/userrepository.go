@@ -32,30 +32,6 @@ func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 	return u, nil
 }
 
-func (r *UserRepository) UpdateRoleAdmin(email string) (*model.User, error) {
-	u := &model.User{
-		ID:                1,
-		Email:             "test@testtest.test",
-		Password:          "qwerty",
-		Role:              "admin",
-		EncryptedPassword: "qwerty",
-	}
-	u.Role = "admin"
-	return u, nil
-}
-
-func (r *UserRepository) UpdateRoleManager(email string) (*model.User, error) {
-	u := &model.User{
-		ID:                1,
-		Email:             "test@testtest.test",
-		Password:          "qwerty",
-		Role:              "admin",
-		EncryptedPassword: "qwerty",
-	}
-	u.Role = "admin"
-	return u, nil
-
-}
 func (r *UserRepository) ChangePassword(u *model.User) error {
 	if err := u.BeforeCreate(); err != nil {
 		return err

@@ -32,30 +32,6 @@ func TestUserRepository_FindByEmail(t *testing.T) {
 	assert.Equal(t, u.Email, "userTest1@test.org")
 }
 
-func TestUserRepository_UpdateRoleAdmin(t *testing.T) {
-	//email := "user@test.com"
-	s := teststore.New()
-	u := model.TestUser(t)
-	u.Role = "manager"
-	var err error
-	u, err = s.User().UpdateRoleAdmin(u.Email)
-	assert.NoError(t, err)
-	assert.Equal(t, u.Role, "admin")
-
-}
-
-func TestUserRepository_UpdateRoleManager(t *testing.T) {
-	//email := "user@test.com"
-	s := teststore.New()
-	u := model.TestUser(t)
-	u.Role = "admin"
-	var err error
-	u, err = s.User().UpdateRoleManager(u.Email)
-	assert.NoError(t, err)
-	assert.Equal(t, u.Role, "manager")
-
-}
-
 func TestUserRepository_ChangePassword(t *testing.T) {
 	var err error
 	s := teststore.New()

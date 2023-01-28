@@ -16,7 +16,7 @@ func SendEmailMessage(sendersMail, sendersMailPassword, smtpEmail, RecipientMail
 	message.SetHeader("From", sendersMail)
 	message.SetHeader("To", RecipientMail)
 	message.SetHeader("Subject", Subject)
-	message.SetBody("text/plain", Body) //
+	message.SetBody("text/html", Body) //
 	a := gomail.NewDialer(smtpEmail, 465, sendersMail, sendersMailPassword)
 	a.StartTLSPolicy = gomail.MandatoryStartTLS
 	if err := a.DialAndSend(message); err != nil {

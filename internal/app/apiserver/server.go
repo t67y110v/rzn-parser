@@ -50,6 +50,7 @@ func (s *Server) configureRouter() {
 	s.router.HandleFunc("/departmentCondition", s.handleDepartmentCondition()).Methods("POST") //почта  -> статус:200 json {"isadmin":false,"educationDepartment":true,"sourceTrackingDepartment":true,"periodicReportingDepartment":false,"internationalDepartment":false,"documentationDepartment":false,"nrDepartment":false,"dbDepartment":true}
 	s.router.HandleFunc("/sendEmail", s.handleSendEmail()).Methods("POST")
 	s.router.HandleFunc("/adminAccess", s.handleAdminAccess()).Methods("POST")
+	s.router.HandleFunc("/parse", s.handleParser()).Methods("POST")
 }
 
 func (s *Server) error(w http.ResponseWriter, r *http.Request, code int, err error) {

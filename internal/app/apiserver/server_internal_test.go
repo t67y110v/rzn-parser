@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"restApi/internal/app/logging"
 	"restApi/internal/app/model"
 	"restApi/internal/app/store/teststore"
 	"testing"
@@ -13,7 +14,8 @@ import (
 )
 
 func TestServer_HandleUsersCreate(t *testing.T) {
-	s := newServer(teststore.New(), nil)
+	log := logging.GetLogger()
+	s := newServer(teststore.New(), nil, log)
 	testCases := []struct {
 		name         string
 		payload      interface{}
@@ -62,7 +64,8 @@ func TestServer_HabdleSessionsCreate(t *testing.T) {
 	u := model.TestUser(t)
 	store := teststore.New()
 	store.User().Create(u)
-	s := newServer(store, nil)
+	log := logging.GetLogger()
+	s := newServer(store, nil, log)
 	testCases := []struct {
 		name         string
 		payload      interface{}

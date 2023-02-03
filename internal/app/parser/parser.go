@@ -2,9 +2,11 @@ package parser
 
 import (
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"io"
-	"log"
+
+	//"log"
 	"net/http"
 	"time"
 
@@ -21,7 +23,8 @@ func Parser(login, password string) (string, error) {
 	var data = strings.NewReader(dataString)
 	req, err := http.NewRequest("POST", "http://external.roszdravnadzor.ru/?type=logon", data)
 	if err != nil {
-		log.Fatal(err)
+		//	log.Fatal(err)
+
 		return "", err
 	}
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
@@ -34,26 +37,35 @@ func Parser(login, password string) (string, error) {
 	req.Header.Set("Upgrade-Insecure-Requests", "1")
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36")
 	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatal(err)
+	if err != nil || resp == nil {
+		//	log.Fatal(err)
+
 		return "", err
 	}
 	defer resp.Body.Close()
 	_, err = io.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal(err)
+		//	log.Fatal(err)
+
 		return "", err
 	}
 
 	coockie := resp.Header.Get("Set-Cookie")
 
 	reg := regexp.MustCompile(`sid_EXTERNAL=(\d+)`)
+	if len(reg.FindStringSubmatch(coockie)) == 0 {
+
+		return "", errors.New("Wrong login or password")
+	}
 	sidValue := reg.FindStringSubmatch(coockie)
-	count := reqWithFilter(sidValue[1])
+	count, err := reqWithFilter(sidValue[1])
+	if err != nil {
+		return "", err
+	}
 	return count, nil
 }
 
-func reqWithFilter(sid string) string {
+func reqWithFilter(sid string) (string, error) {
 
 	now := time.Now()
 	weekAgo := now.AddDate(0, 0, -7)
@@ -78,9 +90,13 @@ func reqWithFilter(sid string) string {
 	query.Add("q_kind", "0")
 	query.Add("q_pregnancy", "0")
 	req.URL.RawQuery = query.Encode()
+
 	if err != nil {
-		return "0"
+		//	log.Fatal(err)
+		fmt.Println("1")
+		return "0", err
 	}
+
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
 	req.Header.Set("Accept-Language", "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7")
 	req.Header.Set("Connection", "keep-alive")
@@ -90,22 +106,27 @@ func reqWithFilter(sid string) string {
 	req.Header.Set("Upgrade-Insecure-Requests", "1")
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36")
 	resp, err := client.Do(req)
+	fmt.Println(resp)
 	if err != nil {
-		log.Fatal(err)
-		return "0"
+		fmt.Println("2")
+		//	log.Fatal(err)
+		return "0", err
 	}
+
 	defer resp.Body.Close()
 	bodyText, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal(err)
-		return "0"
+		fmt.Println("3")
+		//	log.Fatal(err)
+		return "0", err
 	}
+
 	regex := regexp.MustCompile(`\d+\s-\s\d+\sиз\s(\d+)`)
 	matches := regex.FindStringSubmatch(string(bodyText))
 	if len(matches) > 0 {
-		return matches[1]
+		return matches[1], nil
 	} else {
-		return "0"
+		return "0", nil
 	}
 
 }

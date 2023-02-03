@@ -3,7 +3,9 @@ package apiserver
 import (
 	"encoding/json"
 	"errors"
+
 	"net/http"
+	"restApi/internal/app/handlers"
 	"restApi/internal/app/logging"
 
 	"restApi/internal/app/store"
@@ -12,24 +14,20 @@ import (
 	//"github.com/sirupsen/logrus"
 )
 
-var (
-	errorIncorrectEmailOrPassword = errors.New("incorrect email or password")
-	errorThisUserIsNotAdmin       = errors.New("this user is not an admin")
-)
-
 type Server struct {
-	router *mux.Router
-	logger logging.Logger
-	store  store.UserStore
-	config *Config
+	router   *mux.Router
+	logger   logging.Logger
+	handlers handlers.Handlers
+	config   *Config
 }
 
-func newServer(store store.UserStore, config *Config) *Server {
+func newServer(store store.UserStore, config *Config, logger logging.Logger) *Server {
+
 	s := &Server{
-		router: mux.NewRouter(),
-		logger: logging.GetLogger(),
-		store:  store,
-		config: config,
+		router:   mux.NewRouter(),
+		handlers: *handlers.NewHandlers(store, logger),
+		logger:   logging.GetLogger(),
+		config:   config,
 	}
 
 	s.configureRouter()
@@ -42,14 +40,14 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) configureRouter() {
 	//s.router.Host("{subdomain:[a-z]+}.example.com")
-	s.router.HandleFunc("/userCreate", s.handleUsersCreate()).Methods("POST")                  //почта + пароль + имя + фамилия + булевые значения для каждого отдела -> статус:201 json {"id":27,"email":"test3@gmail.com","isadmin":false}
-	s.router.HandleFunc("/userUpdate", s.handleUserUpdate()).Methods("PUT")                    //почта + булевые значения для каждого отдела  ->  статус:200 json {"isadmin":false,"educationDepartment":true,"sourceTrackingDepartment":true,"periodicReportingDepartment":false,"internationalDepartment":false,"documentationDepartment":false,"nrDepartment":false,"dbDepartment":true}
-	s.router.HandleFunc("/userDelete", s.handleUserDelete()).Methods("DELETE")                 //почта  -> статус:200 json  {result : true}
-	s.router.HandleFunc("/sessions", s.handleSessionsCreate()).Methods("POST")                 //почта + пароль -> статус:200 json {"isAdmin":"false"}
-	s.router.HandleFunc("/changePassword", s.handlePasswordChange()).Methods("PUT")            //почта + новый пароль -> статус:200 json {Модель пользователя с очищенным полем пароля}
-	s.router.HandleFunc("/departmentCondition", s.handleDepartmentCondition()).Methods("POST") //почта  -> статус:200 json {"isadmin":false,"educationDepartment":true,"sourceTrackingDepartment":true,"periodicReportingDepartment":false,"internationalDepartment":false,"documentationDepartment":false,"nrDepartment":false,"dbDepartment":true}
+	s.router.HandleFunc("/userCreate", s.handlers.HandleUsersCreate()).Methods("POST")                  //почта + пароль + имя + фамилия + булевые значения для каждого отдела -> статус:201 json {"id":27,"email":"test3@gmail.com","isadmin":false}
+	s.router.HandleFunc("/userUpdate", s.handlers.HandleUserUpdate()).Methods("PUT")                    //почта + булевые значения для каждого отдела  ->  статус:200 json {"isadmin":false,"educationDepartment":true,"sourceTrackingDepartment":true,"periodicReportingDepartment":false,"internationalDepartment":false,"documentationDepartment":false,"nrDepartment":false,"dbDepartment":true}
+	s.router.HandleFunc("/userDelete", s.handlers.HandleUserDelete()).Methods("DELETE")                 //почта  -> статус:200 json  {result : true}
+	s.router.HandleFunc("/sessions", s.handlers.HandleSessionsCreate()).Methods("POST")                 //почта + пароль -> статус:200 json {"isAdmin":"false"}
+	s.router.HandleFunc("/changePassword", s.handlers.HandlePasswordChange()).Methods("PUT")            //почта + новый пароль -> статус:200 json {Модель пользователя с очищенным полем пароля}
+	s.router.HandleFunc("/departmentCondition", s.handlers.HandleDepartmentCondition()).Methods("POST") //почта  -> статус:200 json {"isadmin":false,"educationDepartment":true,"sourceTrackingDepartment":true,"periodicReportingDepartment":false,"internationalDepartment":false,"documentationDepartment":false,"nrDepartment":false,"dbDepartment":true}
 	s.router.HandleFunc("/sendEmail", s.handleSendEmail()).Methods("POST")
-	s.router.HandleFunc("/adminAccess", s.handleAdminAccess()).Methods("POST")
+	s.router.HandleFunc("/adminAccess", s.handlers.HandleAdminAccess()).Methods("POST")
 	s.router.HandleFunc("/parse", s.handleParser()).Methods("POST")
 }
 
@@ -62,3 +60,8 @@ func (s *Server) respond(w http.ResponseWriter, r *http.Request, code int, data 
 		json.NewEncoder(w).Encode(data)
 	}
 }
+
+var (
+	errorIncorrectEmailOrPassword = errors.New("incorrect email or password")
+	errorThisUserIsNotAdmin       = errors.New("this user is not an admin")
+)

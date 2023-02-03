@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"restApi/internal/app/logging"
 	sqlstore "restApi/internal/app/store/sqlstore/users"
 )
 
@@ -16,7 +17,8 @@ func Start(config *Config) error {
 	}
 	defer db.Close()
 	store := sqlstore.New(db)
-	server := newServer(store, config)
+	logger := logging.GetLogger()
+	server := newServer(store, config, logger)
 	return http.ListenAndServe(config.BindAddr, server)
 }
 

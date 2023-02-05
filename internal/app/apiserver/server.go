@@ -2,7 +2,6 @@ package apiserver
 
 import (
 	"encoding/json"
-	"errors"
 
 	"net/http"
 	"restApi/internal/app/handlers"
@@ -46,9 +45,9 @@ func (s *Server) configureRouter() {
 	s.router.HandleFunc("/sessions", s.handlers.HandleSessionsCreate()).Methods("POST")                 //почта + пароль -> статус:200 json {"isAdmin":"false"}
 	s.router.HandleFunc("/changePassword", s.handlers.HandlePasswordChange()).Methods("PUT")            //почта + новый пароль -> статус:200 json {Модель пользователя с очищенным полем пароля}
 	s.router.HandleFunc("/departmentCondition", s.handlers.HandleDepartmentCondition()).Methods("POST") //почта  -> статус:200 json {"isadmin":false,"educationDepartment":true,"sourceTrackingDepartment":true,"periodicReportingDepartment":false,"internationalDepartment":false,"documentationDepartment":false,"nrDepartment":false,"dbDepartment":true}
-	s.router.HandleFunc("/sendEmail", s.handleSendEmail()).Methods("POST")
+	s.router.HandleFunc("/sendEmail", s.handlers.HandleSendEmail(s.config.EmailSender, s.config.PasswordSender, s.config.SmtpEmail)).Methods("POST")
 	s.router.HandleFunc("/adminAccess", s.handlers.HandleAdminAccess()).Methods("POST")
-	s.router.HandleFunc("/parse", s.handleParser()).Methods("POST")
+	s.router.HandleFunc("/parse", s.handlers.HandleParser()).Methods("POST")
 }
 
 func (s *Server) error(w http.ResponseWriter, r *http.Request, code int, err error) {
@@ -60,8 +59,3 @@ func (s *Server) respond(w http.ResponseWriter, r *http.Request, code int, data 
 		json.NewEncoder(w).Encode(data)
 	}
 }
-
-var (
-	errorIncorrectEmailOrPassword = errors.New("incorrect email or password")
-	errorThisUserIsNotAdmin       = errors.New("this user is not an admin")
-)

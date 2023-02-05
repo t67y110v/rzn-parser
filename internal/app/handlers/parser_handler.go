@@ -1,0 +1,36 @@
+package handlers
+
+import (
+	"encoding/json"
+
+	"net/http"
+	parser "restApi/internal/app/parser"
+)
+
+func (h *Handlers) HandleParser() http.HandlerFunc {
+	type request struct {
+		Login    string `json:"login"`
+		Password string `json:"password"`
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := &request{}
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			h.error(w, r, http.StatusBadRequest, err)
+			h.logger.Warningf("handle /parser, status :%d, error :%e", http.StatusBadRequest, err)
+			return
+		}
+		count, err := parser.Parser(req.Login, req.Password)
+		if err != nil {
+			h.error(w, r, http.StatusBadRequest, errorIncorrectEmailOrPassword)
+			h.logger.Warningf("handle /parser, status :%d, error :%e", http.StatusBadRequest, err)
+			return
+		}
+		type resp struct {
+			Result string `json:"result"`
+		}
+		res := &resp{}
+		res.Result = count
+		h.respond(w, r, http.StatusOK, res)
+		h.logger.Infof("handle /parser, status :%d", http.StatusOK)
+	}
+}

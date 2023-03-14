@@ -1,36 +1,35 @@
 package handlers
 
 import (
-	"bytes"
-	"encoding/json"
-	"restApi/internal/app/model"
+	"restApi/internal/app/handlers/responses"
 
 	"github.com/gofiber/fiber/v2"
 )
 
+// @Summary Department condition
+// @Description getting current department condition
+// @Tags         Department
+//
+//	@Accept       json
+//
+// @Produce json
+// @Param        email   path      string  true  "Email"
+// @Success 200 {object} responses.DepartmentRes
+// @Failure 400 {object} responses.Error
+// @Failure 500 {object} responses.Error
+// @Router /department/condition/{email} [get]
 func (h *Handlers) HandleDepartmentCondition() fiber.Handler {
-	type request struct {
-		Email string `json:"email"`
-	}
-	return func(c *fiber.Ctx) error {
-		req := &request{}
-		reader := bytes.NewReader(c.Body())
 
-		if err := json.NewDecoder(reader).Decode(req); err != nil {
-			h.logger.Warningf("handle register, status :%d, error :%e", fiber.StatusBadRequest, err)
-		}
-		u, err := h.store.User().DepartmentCondition(req.Email)
+	return func(c *fiber.Ctx) error {
+		email := c.Params("email")
+		u, err := h.store.User().DepartmentCondition(email)
 		if err != nil {
 			return c.JSON(fiber.Map{
 				"message": err,
 			})
 		}
-		type resp struct {
-			Departments           model.Department
-			MonitoringSpecialist  bool `json:"monitoring_specialist"`
-			MonitoringResponsible int  `json:"monitoring_responsible"`
-		}
-		res := &resp{}
+
+		res := &responses.DepartmentRes{}
 		res.Departments.ClientDepartment = u.Department.ClientDepartment
 		res.Departments.EducationDepartment = u.Department.EducationDepartment
 		res.Departments.SourceTrackingDepartment = u.Department.SourceTrackingDepartment

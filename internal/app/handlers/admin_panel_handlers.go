@@ -3,11 +3,24 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"restApi/internal/app/handlers/responses"
 	"restApi/internal/app/utils"
 
 	"github.com/gofiber/fiber/v2"
 )
 
+// @Summary AdminAccess
+// @Description checking that user have admin rights
+// @Tags         Admin
+//
+//	@Accept       json
+//
+// @Produce json
+// @Param  data body requests.EmailPassword  true "check adming rights"
+// @Success 200 {object} responses.Result
+// @Failure 400 {object} responses.Error
+// @Failure 500 {object} responses.Error
+// @Router /admin/access [post]
 func (h *Handlers) HandleAdminAccess() fiber.Handler {
 	type request struct {
 		Email    string `json:"email"`
@@ -33,10 +46,7 @@ func (h *Handlers) HandleAdminAccess() fiber.Handler {
 			})
 		} else {
 
-			type resp struct {
-				Result bool `json:"result"`
-			}
-			res := &resp{}
+			res := &responses.Result{}
 
 			res.Result = true
 			return c.JSON(res)

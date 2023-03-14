@@ -4,18 +4,29 @@ import (
 	"bytes"
 	"encoding/json"
 
+	"restApi/internal/app/handlers/requests"
+	"restApi/internal/app/handlers/responses"
 	parser "restApi/internal/app/parser"
 
 	"github.com/gofiber/fiber/v2"
 )
 
+// @Summary Parser
+// @Description pars site to get informaion about nr
+// @Tags         Parser
+//
+//	@Accept       json
+//
+// @Produce json
+// @Param  data body requests.ParserLogin  true "create new user"
+// @Success 200 {object} responses.ParserResult
+// @Failure 400 {object} responses.Error
+// @Failure 500 {object} responses.Error
+// @Router /parser/parse [post]
 func (h *Handlers) HandleParser() fiber.Handler {
-	type request struct {
-		Login    string `json:"login"`
-		Password string `json:"password"`
-	}
+
 	return func(c *fiber.Ctx) error {
-		req := &request{}
+		req := &requests.ParserLogin{}
 		reader := bytes.NewReader(c.Body())
 
 		if err := json.NewDecoder(reader).Decode(req); err != nil {
@@ -27,10 +38,8 @@ func (h *Handlers) HandleParser() fiber.Handler {
 				"message": err,
 			})
 		}
-		type resp struct {
-			Result string `json:"result"`
-		}
-		res := &resp{}
+
+		res := &responses.ParserResult{}
 		res.Result = count
 		return c.JSON(res)
 	}

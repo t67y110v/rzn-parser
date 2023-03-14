@@ -4,9 +4,11 @@ import (
 	"restApi/internal/app/handlers"
 	"restApi/internal/app/logging"
 
+	_ "restApi/docs"
 	"restApi/internal/app/store"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/swagger"
 	//"github.com/sirupsen/logrus"
@@ -34,12 +36,12 @@ func newServer(store store.UserStore, config *Config, logger logging.Logger) *Se
 
 func (s *Server) configureRouter() {
 
-	// s.router.Use(cors.New(cors.Config{
-	// 	AllowHeaders:     "Origin, Content-Type, Accept",
-	// 	AllowCredentials: true,
-	// }))
+	s.router.Use(cors.New(cors.Config{
+		AllowHeaders:     "Origin, Content-Type, Accept",
+		AllowCredentials: true,
+	}))
 
-	s.router.Get("/swagger/", swagger.HandlerDefault)
+	s.router.Get("/swagger/*", swagger.HandlerDefault)
 
 	user := s.router.Group("/user")
 	user.Use(logger.New())
@@ -47,7 +49,7 @@ func (s *Server) configureRouter() {
 	user.Delete("/delete", s.handlers.HandleUserDelete())
 	user.Post("/session", s.handlers.HandleSessionsCreate())
 	user.Put("/update", s.handlers.HandleUserUpdate())
-	user.Put("/changePassword", s.handlers.HandlePasswordChange())
+	user.Put("/change/password", s.handlers.HandlePasswordChange())
 
 	email := s.router.Group("/email")
 	email.Post("/send", s.handlers.HandleSendEmail(s.config.EmailSender, s.config.PasswordSender, s.config.SmtpEmail))
@@ -56,18 +58,8 @@ func (s *Server) configureRouter() {
 	parser.Post("/parse", s.handlers.HandleParser())
 
 	department := s.router.Group("/department")
-	department.Post("/condition", s.handlers.HandleDepartmentCondition())
+	department.Get("/condition/:email", s.handlers.HandleDepartmentCondition())
 
 	admin := s.router.Group("admin")
 	admin.Post("/access", s.handlers.HandleAdminAccess())
-	//s.router.Host("{subdomain:[a-z]+}.example.com")
-	//	s.router.HandleFunc("/userCreate", s.handlers.HandleUsersCreate()).Methods("POST")                  //почта + пароль + имя + фамилия + булевые значения для каждого отдела -> статус:201 json {"id":27,"email":"test3@gmail.com","isadmin":false}
-	//	s.router.HandleFunc("/userUpdate", s.handlers.HandleUserUpdate()).Methods("PUT")                    //почта + булевые значения для каждого отдела  ->  статус:200 json {"isadmin":false,"educationDepartment":true,"sourceTrackingDepartment":true,"periodicReportingDepartment":false,"internationalDepartment":false,"documentationDepartment":false,"nrDepartment":false,"dbDepartment":true}
-	//	s.router.HandleFunc("/userDelete", s.handlers.HandleUserDelete()).Methods("DELETE")                 //почта  -> статус:200 json  {result : true}
-	//	s.router.HandleFunc("/sessions", s.handlers.HandleSessionsCreate()).Methods("POST")                 //почта + пароль -> статус:200 json {"isAdmin":"false"}
-	//	s.router.HandleFunc("/changePassword", s.handlers.HandlePasswordChange()).Methods("PUT")            //почта + новый пароль -> статус:200 json {Модель пользователя с очищенным полем пароля}
-	//	s.router.HandleFunc("/departmentCondition", s.handlers.HandleDepartmentCondition()).Methods("POST") //почта  -> статус:200 json {"isadmin":false,"educationDepartment":true,"sourceTrackingDepartment":true,"periodicReportingDepartment":false,"internationalDepartment":false,"documentationDepartment":false,"nrDepartment":false,"dbDepartment":true}
-	//s.router.HandleFunc("/sendEmail", s.handlers.HandleSendEmail(s.config.EmailSender, s.config.PasswordSender, s.config.SmtpEmail)).Methods("POST")
-	//s.router.HandleFunc("/adminAccess", s.handlers.HandleAdminAccess()).Methods("POST")
-	//s.router.HandleFunc("/parse", s.handlers.HandleParser()).Methods("POST")
 }

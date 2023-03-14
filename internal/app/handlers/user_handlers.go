@@ -3,24 +3,29 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"restApi/internal/app/handlers/requests"
+	"restApi/internal/app/handlers/responses"
 	"restApi/internal/app/model"
 
 	"github.com/gofiber/fiber/v2"
 )
 
+// @Summary User Create
+// @Description creation of user
+// @Tags         User
+//
+//	@Accept       json
+//
+// @Produce json
+// @Param  data body requests.CreateUser  true "create new user"
+// @Success 200 {object} responses.CreateUser
+// @Failure 400 {object} responses.Error
+// @Failure 500 {object} responses.Error
+// @Router /user/create [post]
 func (h *Handlers) HandleUsersCreate() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		type request struct {
-			Email                 string           `json:"email"`
-			Role                  string           `json:"user_role"`
-			Password              string           `json:"password"`
-			Name                  string           `json:"name"`
-			SeccondName           string           `json:"seccond_name"`
-			Departments           model.Department `json:"departments"`
-			MonitoringSpecialist  bool             `json:"monitoring_specialist"`
-			MonitoringResponsible int              `json:"monitoring_responsible"`
-		}
-		req := &request{}
+		req := &requests.CreateUser{}
 		reader := bytes.NewReader(c.Body())
 
 		if err := json.NewDecoder(reader).Decode(req); err != nil {
@@ -61,13 +66,8 @@ func (h *Handlers) HandleUsersCreate() fiber.Handler {
 				"message": err,
 			})
 		}
-		type resp struct {
-			ID          int    `json:"id"`
-			Email       string `json:"email"`
-			Name        string `json:"name"`
-			SeccondName string `json:"seccond_name"`
-		}
-		res := &resp{}
+
+		res := &responses.CreateUser{}
 		res.ID = u.ID
 		res.Email = u.Email
 		res.Name = u.Name
@@ -76,13 +76,21 @@ func (h *Handlers) HandleUsersCreate() fiber.Handler {
 	}
 }
 
+// @Summary Session Create
+// @Description creation new session
+// @Tags         User
+//
+//	@Accept       json
+//
+// @Produce json
+// @Param  data body requests.EmailPassword  true "create new session"
+// @Success 200 {object} responses.CreateUser
+// @Failure 400 {object} responses.Error
+// @Failure 500 {object} responses.Error
+// @Router /user/session [post]
 func (h *Handlers) HandleSessionsCreate() fiber.Handler {
-	type request struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
 	return func(c *fiber.Ctx) error {
-		req := &request{}
+		req := &requests.EmailPassword{}
 		reader := bytes.NewReader(c.Body())
 
 		if err := json.NewDecoder(reader).Decode(req); err != nil {
@@ -100,13 +108,22 @@ func (h *Handlers) HandleSessionsCreate() fiber.Handler {
 	}
 }
 
+// @Summary Password Change
+// @Description change users passwrod
+// @Tags         User
+//
+//	@Accept       json
+//
+// @Produce json
+// @Param  data body requests.EmailPassword  true "change users password"
+// @Success 200 {object} responses.CreateUser
+// @Failure 400 {object} responses.Error
+// @Failure 500 {object} responses.Error
+// @Router /user/change/password [put]
 func (h *Handlers) HandlePasswordChange() fiber.Handler {
-	type request struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
+
 	return func(c *fiber.Ctx) error {
-		req := &request{}
+		req := &requests.EmailPassword{}
 		reader := bytes.NewReader(c.Body())
 
 		if err := json.NewDecoder(reader).Decode(req); err != nil {
@@ -126,20 +143,23 @@ func (h *Handlers) HandlePasswordChange() fiber.Handler {
 	}
 }
 
+// @Summary User Update
+// @Description update users info
+// @Tags         User
+//
+//	@Accept       json
+//
+// @Produce json
+// @Param  data body requests.UpdateUser  true "update users information"
+// @Success 200 {object} responses.UserUpdate
+// @Failure 400 {object} responses.Error
+// @Failure 500 {object} responses.Error
+// @Router /user/update [put]
 func (h *Handlers) HandleUserUpdate() fiber.Handler {
 
-	type request struct {
-		Email                 string           `json:"email"`
-		Name                  string           `json:"name"`
-		SeccondName           string           `json:"seccond_name"`
-		Role                  string           `json:"user_role"`
-		Departments           model.Department `json:"departments"`
-		MonitoringSpecialist  bool             `json:"monitoring_specialist"`
-		MonitoringResponsible int              `json:"monitoring_responsible"`
-	}
 	return func(c *fiber.Ctx) error {
 
-		req := &request{}
+		req := &requests.UpdateUser{}
 
 		reader := bytes.NewReader(c.Body())
 
@@ -162,16 +182,11 @@ func (h *Handlers) HandleUserUpdate() fiber.Handler {
 			req.MonitoringResponsible)
 		if err != nil {
 			return c.JSON(fiber.Map{
-				"message": err,
+				"message": fmt.Sprintf("%e", err),
 			})
 		}
-		type resp struct {
-			Role                  string           `json:"user_role"`
-			Departments           model.Department `json:"departments"`
-			MonitoringSpecialist  bool             `json:"monitoring_specialist"`
-			MonitoringResponsible int              `json:"monitoring_responsible"`
-		}
-		res := &resp{}
+
+		res := &responses.UserUpdate{}
 		res.Role = u.Role
 		res.Departments.ClientDepartment = u.Department.ClientDepartment
 		res.Departments.EducationDepartment = u.Department.EducationDepartment
@@ -188,6 +203,18 @@ func (h *Handlers) HandleUserUpdate() fiber.Handler {
 
 }
 
+// @Summary User Delete
+// @Description delete user from system
+// @Tags         User
+//
+//	@Accept       json
+//
+// @Produce json
+// @Param  data body requests.Email true "delete user from system"
+// @Success 200 {object} responses.Result
+// @Failure 400 {object} responses.Error
+// @Failure 500 {object} responses.Error
+// @Router /user/delete [delete]
 func (h *Handlers) HandleUserDelete() fiber.Handler {
 	type request struct {
 		Email string `json:"email"`

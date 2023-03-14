@@ -16,6 +16,13 @@ func init() {
 	flag.StringVar(&configPath, "config-path", "configs/apiserver.toml", "path to config file")
 }
 
+// @title PVSystem24 API
+// @version 1.12.0
+// @description Swag documentaion for PVSystem24 API
+
+// @host localhost:4000
+// @BasePath /
+
 func main() {
 	logging.Init()
 	l := logging.GetLogger()

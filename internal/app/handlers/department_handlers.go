@@ -1,26 +1,29 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
-	"net/http"
 	"restApi/internal/app/model"
+
+	"github.com/gofiber/fiber/v2"
 )
 
-func (h *Handlers) HandleDepartmentCondition() http.HandlerFunc {
+func (h *Handlers) HandleDepartmentCondition() fiber.Handler {
 	type request struct {
 		Email string `json:"email"`
 	}
-	return func(w http.ResponseWriter, r *http.Request) {
+	return func(c *fiber.Ctx) error {
 		req := &request{}
-		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-			h.error(w, r, http.StatusBadRequest, err)
-			h.logger.Warningf("handle /departmentCondition, status :%d, error :%e", http.StatusBadRequest, err)
-			return
+		reader := bytes.NewReader(c.Body())
+
+		if err := json.NewDecoder(reader).Decode(req); err != nil {
+			h.logger.Warningf("handle register, status :%d, error :%e", fiber.StatusBadRequest, err)
 		}
 		u, err := h.store.User().DepartmentCondition(req.Email)
 		if err != nil {
-			h.logger.Warningf("handle /departmentCondition, status :%d, error :%e", http.StatusBadRequest, err)
-			return
+			return c.JSON(fiber.Map{
+				"message": err,
+			})
 		}
 		type resp struct {
 			Departments           model.Department
@@ -38,7 +41,6 @@ func (h *Handlers) HandleDepartmentCondition() http.HandlerFunc {
 		res.Departments.DbDepartment = u.Department.DbDepartment
 		res.MonitoringSpecialist = u.MonitoringSpecialist
 		res.MonitoringResponsible = u.MonitoringResponsible
-		h.respond(w, r, http.StatusOK, res)
-		h.logger.Infof("handle /departmentCondition, status :%d", http.StatusOK)
+		return c.JSON(res)
 	}
 }

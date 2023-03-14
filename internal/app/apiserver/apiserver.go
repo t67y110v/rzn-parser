@@ -3,7 +3,6 @@ package apiserver
 import (
 	"database/sql"
 	"log"
-	"net/http"
 	"restApi/internal/app/logging"
 	sqlstore "restApi/internal/app/store/sqlstore/users"
 )
@@ -19,7 +18,7 @@ func Start(config *Config) error {
 	store := sqlstore.New(db)
 	logger := logging.GetLogger()
 	server := newServer(store, config, logger)
-	return http.ListenAndServe(config.BindAddr, server)
+	return server.router.Listen(config.BindAddr)
 }
 
 // инициализация бд

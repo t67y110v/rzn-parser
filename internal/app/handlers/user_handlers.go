@@ -1,28 +1,30 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
-	"net/http"
 	"restApi/internal/app/model"
+
+	"github.com/gofiber/fiber/v2"
 )
 
-func (h *Handlers) HandleUsersCreate() http.HandlerFunc {
-	type request struct {
-		Email                 string           `json:"email"`
-		Role                  string           `json:"user_role"`
-		Password              string           `json:"password"`
-		Name                  string           `json:"name"`
-		SeccondName           string           `json:"seccond_name"`
-		Departments           model.Department `json:"departments"`
-		MonitoringSpecialist  bool             `json:"monitoring_specialist"`
-		MonitoringResponsible int              `json:"monitoring_responsible"`
-	}
-	return func(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) HandleUsersCreate() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		type request struct {
+			Email                 string           `json:"email"`
+			Role                  string           `json:"user_role"`
+			Password              string           `json:"password"`
+			Name                  string           `json:"name"`
+			SeccondName           string           `json:"seccond_name"`
+			Departments           model.Department `json:"departments"`
+			MonitoringSpecialist  bool             `json:"monitoring_specialist"`
+			MonitoringResponsible int              `json:"monitoring_responsible"`
+		}
 		req := &request{}
-		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-			h.error(w, r, http.StatusBadRequest, err)
-			h.logger.Warningf("handle /userCreate, status :%d, error :%e", http.StatusBadRequest, err)
-			return
+		reader := bytes.NewReader(c.Body())
+
+		if err := json.NewDecoder(reader).Decode(req); err != nil {
+			h.logger.Warningf("handle register, status :%d, error :%e", fiber.StatusBadRequest, err)
 		}
 		u := &model.User{
 			Email:       req.Email,
@@ -31,9 +33,9 @@ func (h *Handlers) HandleUsersCreate() http.HandlerFunc {
 			SeccondName: req.SeccondName,
 		}
 		if err := h.store.User().Create(u); err != nil {
-			h.error(w, r, http.StatusUnprocessableEntity, err)
-			h.logger.Warningf("handle /userCreate, status :%d, error :%e", http.StatusUnprocessableEntity, err)
-			return
+			return c.JSON(fiber.Map{
+				"message": err,
+			})
 		}
 		u.Sanitize()
 		_, err := h.store.User().DepartmentUpdate(
@@ -54,9 +56,10 @@ func (h *Handlers) HandleUsersCreate() http.HandlerFunc {
 		)
 		if err != nil {
 			//fmt.Println("тут")
-			h.error(w, r, http.StatusBadRequest, err)
-			h.logger.Warningf("handle /userCreate, status :%d, error :%e", http.StatusBadRequest, err)
-			return
+
+			return c.JSON(fiber.Map{
+				"message": err,
+			})
 		}
 		type resp struct {
 			ID          int    `json:"id"`
@@ -69,63 +72,61 @@ func (h *Handlers) HandleUsersCreate() http.HandlerFunc {
 		res.Email = u.Email
 		res.Name = u.Name
 		res.SeccondName = u.SeccondName
-		h.respond(w, r, http.StatusCreated, res)
-		h.logger.Infof("handle /userCreate, status :%d", http.StatusCreated)
+		return c.JSON(res)
 	}
 }
 
-func (h *Handlers) HandleSessionsCreate() http.HandlerFunc {
+func (h *Handlers) HandleSessionsCreate() fiber.Handler {
 	type request struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
-	return func(w http.ResponseWriter, r *http.Request) {
+	return func(c *fiber.Ctx) error {
 		req := &request{}
-		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-			h.error(w, r, http.StatusBadRequest, err)
-			h.logger.Warningf("handle /sessions, status :%d, error :%e", http.StatusBadRequest, err)
-			return
+		reader := bytes.NewReader(c.Body())
+
+		if err := json.NewDecoder(reader).Decode(req); err != nil {
+			h.logger.Warningf("handle register, status :%d, error :%e", fiber.StatusBadRequest, err)
 		}
 		u, err := h.store.User().FindByEmail(req.Email)
 		if err != nil || !u.ComparePassword(req.Password) {
-			h.error(w, r, http.StatusUnauthorized, errorIncorrectEmailOrPassword)
-			h.logger.Warningf("handle /sessions, status :%d, error :%e", http.StatusUnauthorized, err)
-			return
+			return c.JSON(fiber.Map{
+				"message": err,
+			})
 		}
 
-		h.respond(w, r, http.StatusOK, u)
-		h.logger.Infof("handle /sessions, status :%d", http.StatusOK)
+		return c.JSON(u)
+		//h.logger.Infof("handle /sessions, status :%d", http.StatusOK)
 	}
 }
 
-func (h *Handlers) HandlePasswordChange() http.HandlerFunc {
+func (h *Handlers) HandlePasswordChange() fiber.Handler {
 	type request struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
-	return func(w http.ResponseWriter, r *http.Request) {
+	return func(c *fiber.Ctx) error {
 		req := &request{}
-		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-			h.error(w, r, http.StatusBadRequest, err)
-			h.logger.Warningf("handle /changePassword, status :%d, error :%e", http.StatusBadRequest, err)
-			return
+		reader := bytes.NewReader(c.Body())
+
+		if err := json.NewDecoder(reader).Decode(req); err != nil {
+			h.logger.Warningf("handle register, status :%d, error :%e", fiber.StatusBadRequest, err)
 		}
 		u := &model.User{
 			Email:    req.Email,
 			Password: req.Password,
 		}
 		if err := h.store.User().ChangePassword(u); err != nil {
-			h.error(w, r, http.StatusUnprocessableEntity, err)
-			h.logger.Warningf("handle /changePassword, status :%d, error :%e", http.StatusUnprocessableEntity, err)
-			return
+			return c.JSON(fiber.Map{
+				"message": err,
+			})
 		}
 		u.Sanitize()
-		h.respond(w, r, http.StatusOK, u)
-		h.logger.Infof("handle /changePassword, status :%d", http.StatusOK)
+		return c.JSON(u)
 	}
 }
 
-func (h *Handlers) HandleUserUpdate() http.HandlerFunc {
+func (h *Handlers) HandleUserUpdate() fiber.Handler {
 
 	type request struct {
 		Email                 string           `json:"email"`
@@ -136,13 +137,14 @@ func (h *Handlers) HandleUserUpdate() http.HandlerFunc {
 		MonitoringSpecialist  bool             `json:"monitoring_specialist"`
 		MonitoringResponsible int              `json:"monitoring_responsible"`
 	}
-	return func(w http.ResponseWriter, r *http.Request) {
+	return func(c *fiber.Ctx) error {
 
 		req := &request{}
-		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-			h.error(w, r, http.StatusBadRequest, err)
-			h.logger.Warningf("handle /userUpdate, status :%d, error :%e", http.StatusBadRequest, err)
-			return
+
+		reader := bytes.NewReader(c.Body())
+
+		if err := json.NewDecoder(reader).Decode(req); err != nil {
+			h.logger.Warningf("handle register, status :%d, error :%e", fiber.StatusBadRequest, err)
 		}
 		u, err := h.store.User().DepartmentUpdate(req.Email,
 			req.Name,
@@ -159,9 +161,9 @@ func (h *Handlers) HandleUserUpdate() http.HandlerFunc {
 			req.MonitoringSpecialist,
 			req.MonitoringResponsible)
 		if err != nil {
-			h.error(w, r, http.StatusBadRequest, err)
-			h.logger.Warningf("handle /userUpdate, status :%d, error :%e", http.StatusBadRequest, err)
-			return
+			return c.JSON(fiber.Map{
+				"message": err,
+			})
 		}
 		type resp struct {
 			Role                  string           `json:"user_role"`
@@ -181,29 +183,28 @@ func (h *Handlers) HandleUserUpdate() http.HandlerFunc {
 		res.Departments.DbDepartment = u.Department.DbDepartment
 		res.MonitoringSpecialist = u.MonitoringSpecialist
 		res.MonitoringResponsible = u.MonitoringResponsible
-
-		h.respond(w, r, http.StatusOK, res)
-		h.logger.Infof("handle /userUpdate, status :%d", http.StatusOK)
+		return c.JSON(res)
 	}
 
 }
 
-func (h *Handlers) HandleUserDelete() http.HandlerFunc {
+func (h *Handlers) HandleUserDelete() fiber.Handler {
 	type request struct {
 		Email string `json:"email"`
 	}
-	return func(w http.ResponseWriter, r *http.Request) {
+	return func(c *fiber.Ctx) error {
 		req := &request{}
-		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-			h.error(w, r, http.StatusBadRequest, err)
-			h.logger.Warningf("handle /userDelete, status :%d, error :%e", http.StatusBadRequest, err)
-			return
+
+		reader := bytes.NewReader(c.Body())
+
+		if err := json.NewDecoder(reader).Decode(req); err != nil {
+			h.logger.Warningf("handle register, status :%d, error :%e", fiber.StatusBadRequest, err)
 		}
 		err := h.store.User().Delete(req.Email)
 		if err != nil {
-			h.error(w, r, http.StatusUnauthorized, errorIncorrectEmailOrPassword)
-			h.logger.Warningf("handle /userDelete, status :%d, error :%e", http.StatusBadRequest, err)
-			return
+			return c.JSON(fiber.Map{
+				"message": err,
+			})
 		}
 		type resp struct {
 			Result bool `json:"result"`
@@ -214,7 +215,7 @@ func (h *Handlers) HandleUserDelete() http.HandlerFunc {
 		} else {
 			res.Result = false
 		}
-		h.respond(w, r, http.StatusOK, res)
-		h.logger.Infof("handle /userDelete, status :%d", http.StatusOK)
+		return c.JSON(res)
+		//h.logger.Infof("handle /userDelete, status :%d", http.StatusOK)
 	}
 }

@@ -15,18 +15,23 @@ import (
 )
 
 func Parser(login, password string) (string, error) {
+
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
+
 	client := &http.Client{Transport: tr}
+
 	dataString := fmt.Sprintf("%s%s%s%s", "type=logon&action=execute&redirect_params=&login=", login, "&password=", password)
+
 	var data = strings.NewReader(dataString)
+
 	req, err := http.NewRequest("POST", "http://external.roszdravnadzor.ru/?type=logon", data)
 	if err != nil {
-		//	log.Fatal(err)
 
 		return "", err
 	}
+
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
 	req.Header.Set("Accept-Language", "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7")
 	req.Header.Set("Cache-Control", "max-age=0")
@@ -36,13 +41,16 @@ func Parser(login, password string) (string, error) {
 	req.Header.Set("Referer", "http://external.roszdravnadzor.ru/?type=logon")
 	req.Header.Set("Upgrade-Insecure-Requests", "1")
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36")
+
 	resp, err := client.Do(req)
 	if err != nil || resp == nil {
 		//	log.Fatal(err)
 
 		return "", err
 	}
+
 	defer resp.Body.Close()
+
 	_, err = io.ReadAll(resp.Body)
 	if err != nil {
 		//	log.Fatal(err)
@@ -55,13 +63,16 @@ func Parser(login, password string) (string, error) {
 	reg := regexp.MustCompile(`sid_EXTERNAL=(\d+)`)
 	if len(reg.FindStringSubmatch(coockie)) == 0 {
 
-		return "", errors.New("Wrong login or password")
+		return "", errors.New("wrong login or password")
 	}
+
 	sidValue := reg.FindStringSubmatch(coockie)
+
 	count, err := reqWithFilter(sidValue[1])
 	if err != nil {
 		return "", err
 	}
+
 	return count, nil
 }
 

@@ -1,40 +1,36 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
-	"net/http"
 	"restApi/internal/app/utils"
+
+	"github.com/gofiber/fiber/v2"
 )
 
-func (h *Handlers) HandleAdminAccess() http.HandlerFunc {
+func (h *Handlers) HandleAdminAccess() fiber.Handler {
 	type request struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
-	return func(w http.ResponseWriter, r *http.Request) {
+	return func(c *fiber.Ctx) error {
 		req := &request{}
-		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-			h.error(w, r, http.StatusBadRequest, err)
-			h.logger.Warningf("handle /adminAccess, status :%d, error :%e", http.StatusBadRequest, err)
-			return
+		reader := bytes.NewReader(c.Body())
+
+		if err := json.NewDecoder(reader).Decode(req); err != nil {
+			h.logger.Warningf("handle register, status :%d, error :%e", fiber.StatusBadRequest, err)
 		}
 		u, err := h.store.User().FindByEmail(req.Email)
 		if err != nil || !u.ComparePassword(req.Password) {
-			h.error(w, r, http.StatusUnauthorized, errorIncorrectEmailOrPassword)
-			h.logger.Warningf("handle /adminAccess, status :%d, error :%e", http.StatusUnauthorized, err)
-			return
-		}
-		if err != nil {
-			h.error(w, r, http.StatusBadRequest, errorIncorrectEmailOrPassword)
-			h.logger.Warningf("handle /adminAccess, status :%d, error :%e", http.StatusBadRequest, err)
-			return
+			return c.JSON(fiber.Map{
+				"message": err,
+			})
 		}
 
 		if !utils.CheckThatUserIsAdmin(u) {
-			h.error(w, r, http.StatusBadRequest, errorThisUserIsNotAdmin)
-			h.logger.Warningf("handle /adminAccess, status :%d, error :%e", http.StatusBadRequest, err)
-
-			return
+			return c.JSON(fiber.Map{
+				"message": err,
+			})
 		} else {
 
 			type resp struct {
@@ -43,9 +39,7 @@ func (h *Handlers) HandleAdminAccess() http.HandlerFunc {
 			res := &resp{}
 
 			res.Result = true
-
-			h.respond(w, r, http.StatusOK, res)
-			h.logger.Infof("handle /adminAccess, status :%d", http.StatusOK)
+			return c.JSON(res)
 		}
 
 	}

@@ -1,36 +1,37 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 
-	"net/http"
 	parser "restApi/internal/app/parser"
+
+	"github.com/gofiber/fiber/v2"
 )
 
-func (h *Handlers) HandleParser() http.HandlerFunc {
+func (h *Handlers) HandleParser() fiber.Handler {
 	type request struct {
 		Login    string `json:"login"`
 		Password string `json:"password"`
 	}
-	return func(w http.ResponseWriter, r *http.Request) {
+	return func(c *fiber.Ctx) error {
 		req := &request{}
-		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-			h.error(w, r, http.StatusBadRequest, err)
-			h.logger.Warningf("handle /parser, status :%d, error :%e", http.StatusBadRequest, err)
-			return
+		reader := bytes.NewReader(c.Body())
+
+		if err := json.NewDecoder(reader).Decode(req); err != nil {
+			h.logger.Warningf("handle register, status :%d, error :%e", fiber.StatusBadRequest, err)
 		}
 		count, err := parser.Parser(req.Login, req.Password)
 		if err != nil {
-			h.error(w, r, http.StatusBadRequest, errorIncorrectEmailOrPassword)
-			h.logger.Warningf("handle /parser, status :%d, error :%e", http.StatusBadRequest, err)
-			return
+			return c.JSON(fiber.Map{
+				"message": err,
+			})
 		}
 		type resp struct {
 			Result string `json:"result"`
 		}
 		res := &resp{}
 		res.Result = count
-		h.respond(w, r, http.StatusOK, res)
-		h.logger.Infof("handle /parser, status :%d", http.StatusOK)
+		return c.JSON(res)
 	}
 }

@@ -529,6 +529,9 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string"
+                },
+                "path": {
+                    "type": "string"
                 }
             }
         },

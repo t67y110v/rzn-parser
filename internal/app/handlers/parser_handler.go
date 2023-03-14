@@ -32,7 +32,7 @@ func (h *Handlers) HandleParser() fiber.Handler {
 		if err := json.NewDecoder(reader).Decode(req); err != nil {
 			h.logger.Warningf("handle register, status :%d, error :%e", fiber.StatusBadRequest, err)
 		}
-		count, err := parser.Parser(req.Login, req.Password)
+		count, err := parser.Parser(req.Login, req.Password, req.Path)
 		if err != nil {
 			return c.JSON(fiber.Map{
 				"message": err,

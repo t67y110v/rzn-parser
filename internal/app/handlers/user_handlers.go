@@ -1,9 +1,7 @@
 package handlers
 
 import (
-	"bytes"
-	"encoding/json"
-	"fmt"
+	"net/http"
 	"restApi/internal/app/handlers/requests"
 	"restApi/internal/app/handlers/responses"
 	"restApi/internal/app/model"
@@ -26,10 +24,12 @@ import (
 func (h *Handlers) HandleUsersCreate() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		req := &requests.CreateUser{}
-		reader := bytes.NewReader(c.Body())
 
-		if err := json.NewDecoder(reader).Decode(req); err != nil {
-			h.logger.Warningf("handle register, status :%d, error :%e", fiber.StatusBadRequest, err)
+		if err := c.BodyParser(&req); err != nil {
+			c.Status(http.StatusBadRequest)
+			return c.JSON(fiber.Map{
+				"message": err.Error(),
+			})
 		}
 		u := &model.User{
 			Email:       req.Email,
@@ -38,8 +38,9 @@ func (h *Handlers) HandleUsersCreate() fiber.Handler {
 			SeccondName: req.SeccondName,
 		}
 		if err := h.store.User().Create(u); err != nil {
+			c.Status(http.StatusInternalServerError)
 			return c.JSON(fiber.Map{
-				"message": err,
+				"message": err.Error(),
 			})
 		}
 		u.Sanitize()
@@ -61,9 +62,9 @@ func (h *Handlers) HandleUsersCreate() fiber.Handler {
 		)
 		if err != nil {
 			//fmt.Println("тут")
-
+			c.Status(http.StatusInternalServerError)
 			return c.JSON(fiber.Map{
-				"message": err,
+				"message": err.Error(),
 			})
 		}
 
@@ -86,20 +87,22 @@ func (h *Handlers) HandleUsersCreate() fiber.Handler {
 // @Param  data body requests.EmailPassword  true "create new session"
 // @Success 200 {object} responses.CreateUser
 // @Failure 400 {object} responses.Error
-// @Failure 500 {object} responses.Error
+// @Failure 401 {object} responses.Error
 // @Router /user/session [post]
 func (h *Handlers) HandleSessionsCreate() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		req := &requests.EmailPassword{}
-		reader := bytes.NewReader(c.Body())
-
-		if err := json.NewDecoder(reader).Decode(req); err != nil {
-			h.logger.Warningf("handle register, status :%d, error :%e", fiber.StatusBadRequest, err)
+		if err := c.BodyParser(&req); err != nil {
+			c.Status(http.StatusBadRequest)
+			return c.JSON(fiber.Map{
+				"message": err.Error(),
+			})
 		}
 		u, err := h.store.User().FindByEmail(req.Email)
 		if err != nil || !u.ComparePassword(req.Password) {
+			c.Status(http.StatusUnauthorized)
 			return c.JSON(fiber.Map{
-				"message": err,
+				"message": err.Error(),
 			})
 		}
 
@@ -124,18 +127,21 @@ func (h *Handlers) HandlePasswordChange() fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
 		req := &requests.EmailPassword{}
-		reader := bytes.NewReader(c.Body())
-
-		if err := json.NewDecoder(reader).Decode(req); err != nil {
-			h.logger.Warningf("handle register, status :%d, error :%e", fiber.StatusBadRequest, err)
+		if err := c.BodyParser(&req); err != nil {
+			c.Status(http.StatusBadRequest)
+			return c.JSON(fiber.Map{
+				"message": err.Error(),
+			})
 		}
+
 		u := &model.User{
 			Email:    req.Email,
 			Password: req.Password,
 		}
 		if err := h.store.User().ChangePassword(u); err != nil {
+			c.Status(http.StatusInternalServerError)
 			return c.JSON(fiber.Map{
-				"message": err,
+				"message": err.Error(),
 			})
 		}
 		u.Sanitize()
@@ -160,11 +166,11 @@ func (h *Handlers) HandleUserUpdate() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 
 		req := &requests.UpdateUser{}
-
-		reader := bytes.NewReader(c.Body())
-
-		if err := json.NewDecoder(reader).Decode(req); err != nil {
-			h.logger.Warningf("handle register, status :%d, error :%e", fiber.StatusBadRequest, err)
+		if err := c.BodyParser(&req); err != nil {
+			c.Status(http.StatusBadRequest)
+			return c.JSON(fiber.Map{
+				"message": err.Error(),
+			})
 		}
 		u, err := h.store.User().DepartmentUpdate(req.Email,
 			req.Name,
@@ -181,8 +187,9 @@ func (h *Handlers) HandleUserUpdate() fiber.Handler {
 			req.MonitoringSpecialist,
 			req.MonitoringResponsible)
 		if err != nil {
+			c.Status(http.StatusInternalServerError)
 			return c.JSON(fiber.Map{
-				"message": fmt.Sprintf("%e", err),
+				"message": err.Error(),
 			})
 		}
 
@@ -216,27 +223,25 @@ func (h *Handlers) HandleUserUpdate() fiber.Handler {
 // @Failure 500 {object} responses.Error
 // @Router /user/delete [delete]
 func (h *Handlers) HandleUserDelete() fiber.Handler {
-	type request struct {
-		Email string `json:"email"`
-	}
+
 	return func(c *fiber.Ctx) error {
-		req := &request{}
+		req := &requests.Email{}
 
-		reader := bytes.NewReader(c.Body())
-
-		if err := json.NewDecoder(reader).Decode(req); err != nil {
-			h.logger.Warningf("handle register, status :%d, error :%e", fiber.StatusBadRequest, err)
+		if err := c.BodyParser(&req); err != nil {
+			c.Status(http.StatusBadRequest)
+			return c.JSON(fiber.Map{
+				"message": err.Error(),
+			})
 		}
 		err := h.store.User().Delete(req.Email)
 		if err != nil {
+			c.Status(http.StatusInternalServerError)
 			return c.JSON(fiber.Map{
-				"message": err,
+				"message": err.Error(),
 			})
 		}
-		type resp struct {
-			Result bool `json:"result"`
-		}
-		res := &resp{}
+
+		res := &responses.Result{}
 		if err == nil {
 			res.Result = true
 		} else {

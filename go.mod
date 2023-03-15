@@ -10,6 +10,7 @@ require (
 	github.com/lib/pq v1.10.6
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.8.0
+	github.com/swaggo/swag v1.8.10
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
 	gopkg.in/mail.v2 v2.3.1
 )
@@ -37,7 +38,6 @@ require (
 	github.com/savsgio/dictpool v0.0.0-20221023140959-7bf2e61cea94 // indirect
 	github.com/savsgio/gotils v0.0.0-20220530130905-52f3993e8d6d // indirect
 	github.com/swaggo/files v0.0.0-20220728132757-551d4a08d97a // indirect
-	github.com/swaggo/swag v1.8.10 // indirect
 	github.com/tinylib/msgp v1.1.6 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.44.0 // indirect

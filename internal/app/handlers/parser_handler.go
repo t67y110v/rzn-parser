@@ -1,8 +1,7 @@
 package handlers
 
 import (
-	"bytes"
-	"encoding/json"
+	"net/http"
 
 	"restApi/internal/app/handlers/requests"
 	"restApi/internal/app/handlers/responses"
@@ -27,15 +26,17 @@ func (h *Handlers) HandleParser() fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
 		req := &requests.ParserLogin{}
-		reader := bytes.NewReader(c.Body())
-
-		if err := json.NewDecoder(reader).Decode(req); err != nil {
-			h.logger.Warningf("handle register, status :%d, error :%e", fiber.StatusBadRequest, err)
+		if err := c.BodyParser(&req); err != nil {
+			c.Status(http.StatusBadRequest)
+			return c.JSON(fiber.Map{
+				"message": err.Error(),
+			})
 		}
 		count, err := parser.Parser(req.Login, req.Password, req.Path)
 		if err != nil {
+			c.Status(http.StatusInternalServerError)
 			return c.JSON(fiber.Map{
-				"message": err,
+				"message": err.Error(),
 			})
 		}
 

@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"bytes"
-	"encoding/json"
+	"net/http"
+	"restApi/internal/app/handlers/requests"
 	"restApi/internal/app/handlers/responses"
 	"restApi/internal/app/utils"
 
@@ -19,30 +19,30 @@ import (
 // @Param  data body requests.EmailPassword  true "check adming rights"
 // @Success 200 {object} responses.Result
 // @Failure 400 {object} responses.Error
+// @Failure 409 {object} responses.Error
 // @Failure 500 {object} responses.Error
 // @Router /admin/access [post]
 func (h *Handlers) HandleAdminAccess() fiber.Handler {
-	type request struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
 	return func(c *fiber.Ctx) error {
-		req := &request{}
-		reader := bytes.NewReader(c.Body())
-
-		if err := json.NewDecoder(reader).Decode(req); err != nil {
-			h.logger.Warningf("handle register, status :%d, error :%e", fiber.StatusBadRequest, err)
+		req := &requests.EmailPassword{}
+		if err := c.BodyParser(&req); err != nil {
+			c.Status(http.StatusBadRequest)
+			return c.JSON(fiber.Map{
+				"message": err.Error(),
+			})
 		}
 		u, err := h.store.User().FindByEmail(req.Email)
 		if err != nil || !u.ComparePassword(req.Password) {
+			c.Status(http.StatusUnauthorized)
 			return c.JSON(fiber.Map{
-				"message": err,
+				"message": err.Error(),
 			})
 		}
 
 		if !utils.CheckThatUserIsAdmin(u) {
+			c.Status(http.StatusConflict)
 			return c.JSON(fiber.Map{
-				"message": err,
+				"message": err.Error(),
 			})
 		} else {
 

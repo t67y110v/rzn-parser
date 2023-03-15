@@ -53,6 +53,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/responses.Error"
                         }
                     },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/responses.Error"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -373,8 +379,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/responses.Error"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/responses.Error"
                         }

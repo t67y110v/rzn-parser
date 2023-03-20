@@ -61,6 +61,8 @@ definitions:
     type: object
   requests.ParserLogin:
     properties:
+      file_name:
+        type: string
       login:
         type: string
       password:

@@ -15,7 +15,7 @@ import (
 	"strings"
 )
 
-func Parser(login, password, path string) (string, error) {
+func Parser(login, password, path, fileName string) (string, error) {
 
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -71,7 +71,7 @@ func Parser(login, password, path string) (string, error) {
 	if len(sidValue) < 2 {
 		return "", errors.New("empty sid value")
 	}
-	count, err := reqWithFilter(sidValue[1], path)
+	count, err := reqWithFilter(sidValue[1], path, fileName)
 	if err != nil {
 		return "", err
 	}
@@ -79,7 +79,7 @@ func Parser(login, password, path string) (string, error) {
 	return count, nil
 }
 
-func reqWithFilter(sid, path string) (string, error) {
+func reqWithFilter(sid, path, fileName string) (string, error) {
 
 	now := time.Now()
 	weekAgo := now.AddDate(0, 0, -7)
@@ -120,7 +120,6 @@ func reqWithFilter(sid, path string) (string, error) {
 	req.Header.Set("Upgrade-Insecure-Requests", "1")
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36")
 	resp, err := client.Do(req)
-	fmt.Println(resp)
 	if err != nil {
 		fmt.Println("2")
 		//	log.Fatal(err)
@@ -138,7 +137,7 @@ func reqWithFilter(sid, path string) (string, error) {
 	regex := regexp.MustCompile(`\d+\s-\s\d+\sиз\s(\d+)`)
 	matches := regex.FindStringSubmatch(string(bodyText))
 	if len(matches) > 0 {
-		if err := downloadXLS(sid, path); err != nil {
+		if err := downloadXLS(sid, path, fileName); err != nil {
 			return matches[1], nil
 		}
 		return matches[1], nil
@@ -148,7 +147,7 @@ func reqWithFilter(sid, path string) (string, error) {
 
 }
 
-func downloadXLS(sid, path string) error {
+func downloadXLS(sid, path, fileName string) error {
 
 	now := time.Now()
 	weekAgo := now.AddDate(0, 0, -7)
@@ -192,9 +191,15 @@ func downloadXLS(sid, path string) error {
 	resp, err := client.Do(req)
 	if err != nil {
 		return err
+		// 	}
 	}
+
+	if err := os.MkdirAll(path, os.ModePerm); err != nil {
+		return err
+	}
+
 	// Create the file
-	out, err := os.Create("test.xls")
+	out, err := os.Create(fmt.Sprintf("%s/%s", path, fileName))
 	if err != nil {
 		return nil
 	}

@@ -32,7 +32,7 @@ func (h *Handlers) HandleParser() fiber.Handler {
 				"message": err.Error(),
 			})
 		}
-		count, err := parser.Parser(req.Login, req.Password, req.Path)
+		count, err := parser.Parser(req.Login, req.Password, req.Path, req.FileName)
 		if err != nil {
 			c.Status(http.StatusInternalServerError)
 			return c.JSON(fiber.Map{

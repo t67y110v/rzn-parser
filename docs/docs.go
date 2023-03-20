@@ -530,6 +530,9 @@ const docTemplate = `{
         "requests.ParserLogin": {
             "type": "object",
             "properties": {
+                "file_name": {
+                    "type": "string"
+                },
                 "login": {
                     "type": "string"
                 },

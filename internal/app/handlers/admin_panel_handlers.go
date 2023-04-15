@@ -42,7 +42,7 @@ func (h *Handlers) HandleAdminAccess() fiber.Handler {
 		if !utils.CheckThatUserIsAdmin(u) {
 			c.Status(http.StatusConflict)
 			return c.JSON(fiber.Map{
-				"message": err.Error(),
+				"message": "user is not an admin",
 			})
 		} else {
 

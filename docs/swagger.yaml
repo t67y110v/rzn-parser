@@ -23,6 +23,8 @@ definitions:
     properties:
       client_department:
         type: boolean
+      cmk_department:
+        type: boolean
       db_department:
         type: boolean
       documentation_department:
@@ -34,6 +36,8 @@ definitions:
       nr_department:
         type: boolean
       periodic_reporting_department:
+        type: boolean
+      sales_department:
         type: boolean
       source_tracking_department:
         type: boolean
@@ -102,6 +106,8 @@ definitions:
     properties:
       client_department:
         type: boolean
+      cmk_department:
+        type: boolean
       db_department:
         type: boolean
       documentation_department:
@@ -113,6 +119,8 @@ definitions:
       nr_department:
         type: boolean
       periodic_reporting_department:
+        type: boolean
+      sales_department:
         type: boolean
       source_tracking_department:
         type: boolean

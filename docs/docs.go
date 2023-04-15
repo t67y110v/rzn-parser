@@ -471,6 +471,9 @@ const docTemplate = `{
                 "client_department": {
                     "type": "boolean"
                 },
+                "cmk_department": {
+                    "type": "boolean"
+                },
                 "db_department": {
                     "type": "boolean"
                 },
@@ -487,6 +490,9 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "periodic_reporting_department": {
+                    "type": "boolean"
+                },
+                "sales_department": {
                     "type": "boolean"
                 },
                 "source_tracking_department": {
@@ -593,6 +599,9 @@ const docTemplate = `{
                 "client_department": {
                     "type": "boolean"
                 },
+                "cmk_department": {
+                    "type": "boolean"
+                },
                 "db_department": {
                     "type": "boolean"
                 },
@@ -609,6 +618,9 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "periodic_reporting_department": {
+                    "type": "boolean"
+                },
+                "sales_department": {
                     "type": "boolean"
                 },
                 "source_tracking_department": {

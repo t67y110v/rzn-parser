@@ -59,6 +59,8 @@ func (h *Handlers) HandleUsersCreate() fiber.Handler {
 			req.Role,
 			req.MonitoringSpecialist,
 			req.MonitoringResponsible,
+			req.Departments.CMKDepartment,
+			req.Departments.SalesDepartment,
 		)
 		if err != nil {
 			//fmt.Println("тут")
@@ -185,7 +187,9 @@ func (h *Handlers) HandleUserUpdate() fiber.Handler {
 			req.Departments.DbDepartment,
 			req.Role,
 			req.MonitoringSpecialist,
-			req.MonitoringResponsible)
+			req.MonitoringResponsible,
+			req.Departments.CMKDepartment,
+			req.Departments.SalesDepartment)
 		if err != nil {
 			c.Status(http.StatusInternalServerError)
 			return c.JSON(fiber.Map{
@@ -205,6 +209,8 @@ func (h *Handlers) HandleUserUpdate() fiber.Handler {
 		res.Departments.DbDepartment = u.Department.DbDepartment
 		res.MonitoringSpecialist = u.MonitoringSpecialist
 		res.MonitoringResponsible = u.MonitoringResponsible
+		res.Departments.CMKDepartment = u.Department.CMKDepartment
+		res.Departments.SalesDepartment = u.Department.SalesDepartment
 		return c.JSON(res)
 	}
 

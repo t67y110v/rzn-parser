@@ -25,6 +25,8 @@ type User struct {
 		DocumentationDepartment     bool `json:"documentation_department"`
 		NrDepartment                bool `json:"nr_department"`
 		DbDepartment                bool `json:"db_department"`
+		CMKDepartment               bool `json:"cmk_department"`
+		SalesDepartment             bool `json:"sales_department"`
 	}
 }
 

@@ -101,10 +101,16 @@ func (h *Handlers) HandleSessionsCreate() fiber.Handler {
 			})
 		}
 		u, err := h.store.User().FindByEmail(req.Email)
-		if err != nil || !u.ComparePassword(req.Password) {
+		if err != nil {
 			c.Status(http.StatusUnauthorized)
 			return c.JSON(fiber.Map{
 				"message": err.Error(),
+			})
+		}
+		if !u.ComparePassword(req.Password) {
+			c.Status(http.StatusUnauthorized)
+			return c.JSON(fiber.Map{
+				"message": "wrong password",
 			})
 		}
 

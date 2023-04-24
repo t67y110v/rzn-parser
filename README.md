@@ -1,6 +1,6 @@
 # REST API 
 
-fiber - swagger - logrus - postgreSQL/pq - testify - gomail
+fiber - swagger - logrus - gorm - testify - gomail
 
 ## Swagger documentaion on http://localhost:4000/swagger/index.html#/
 

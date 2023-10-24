@@ -1,16 +1,10 @@
 package apiserver
 
-import (
-	"restApi/internal/app/logging"
-)
+import "github.com/sirupsen/logrus"
 
 // запуск сервера
-func Start(config *Config) error {
+func Start(config *Config, logger *logrus.Logger) error {
 
-	logger, err := logging.NewLogger()
-	if err != nil {
-		return err
-	}
 	server := newServer(config, logger)
 	return server.router.Listen(config.BindAddr)
 }

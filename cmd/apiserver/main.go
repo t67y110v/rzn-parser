@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"restApi/internal/app/apiserver"
+	"restApi/internal/app/logging"
 
 	"github.com/BurntSushi/toml"
 )
@@ -25,14 +26,21 @@ func init() {
 
 func main() {
 
-	flag.Parse()
-	config := apiserver.NewConfig()
-	_, err := toml.DecodeFile(configPath, config)
+	logger, err := logging.NewLogger()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(fmt.Sprintf("Starting apiserver addr : %s\n", config.BindAddr))
-	if err := apiserver.Start(config); err != nil {
+
+	flag.Parse()
+	config := apiserver.NewConfig()
+	_, err = toml.DecodeFile(configPath, config)
+	if err != nil {
+		logger.Error("error while decoding config file ", err)
+		panic(err)
+	}
+
+	logger.Info(fmt.Sprintf("Starting apiserver addr : %s\n", config.BindAddr))
+	if err := apiserver.Start(config, logger); err != nil {
 		panic(err)
 	}
 }

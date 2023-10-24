@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"restApi/internal/app/apiserver"
 	"restApi/internal/app/logging"
 
@@ -24,18 +25,22 @@ func init() {
 // @BasePath /
 
 func main() {
-	logging.Init()
-	l := logging.GetLogger()
-	l.Infoln("Parsing flag")
-	flag.Parse()
-	l.Infoln("Config initialization")
-	config := apiserver.NewConfig()
-	_, err := toml.DecodeFile(configPath, config)
+
+	logger, err := logging.NewLogger()
 	if err != nil {
-		l.Fatal(err)
+		panic(err)
 	}
-	l.Infof("Starting apiserver addr : %s\n", config.BindAddr)
-	if err := apiserver.Start(config); err != nil {
-		l.Fatal(err)
+
+	flag.Parse()
+	config := apiserver.NewConfig()
+	_, err = toml.DecodeFile(configPath, config)
+	if err != nil {
+		logger.Error("error while decoding config file ", err)
+		panic(err)
+	}
+
+	logger.Info(fmt.Sprintf("Starting apiserver addr : %s\n", config.BindAddr))
+	if err := apiserver.Start(config, logger); err != nil {
+		panic(err)
 	}
 }

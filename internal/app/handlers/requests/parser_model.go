@@ -5,4 +5,5 @@ type ParserLogin struct {
 	Password string `json:"password"`
 	Path     string `json:"path"`
 	FileName string `json:"file_name"`
+	Monthly  bool   `json:"monthly"`
 }

@@ -12,15 +12,6 @@ fiber - swagger - logrus - gorm - testify - gomail
 [server]
 bind_addr=":8080"
 log_level="debug"
-
-[database]
-database_url="user=postgres password=p02tgre2 dbname=restapi sslmode=disable"
-
-[smtp]
-email_sender="email"
-smtp_email="smtp.yandex.ru"
-password_sender="password"
-smtp_port=456
 ```
 
 

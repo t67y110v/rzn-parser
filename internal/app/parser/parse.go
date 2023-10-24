@@ -6,7 +6,6 @@ import (
 	"io"
 	"os"
 
-	//"log"
 	"net/http"
 	"time"
 
@@ -19,7 +18,7 @@ func (p *Parser) Parse(login, password, path, fileName string, mothly bool) (str
 	data := strings.NewReader(fmt.Sprintf("%s%s%s%s", "type=logon&action=execute&redirect_params=&login=", login, "&password=", password))
 	req, err := http.NewRequest("POST", p.Client.BasePath+"/?type=logon", data)
 	if err != nil {
-
+		p.Logger.Error("error while creating new request to /?type=logon ", err)
 		return "", err
 	}
 
@@ -35,33 +34,35 @@ func (p *Parser) Parse(login, password, path, fileName string, mothly bool) (str
 
 	resp, err := p.Client.Do(req)
 	if err != nil || resp == nil {
-		//	log.Fatal(err)
 
+		p.Logger.Error("error while doing request or response is nil ", err)
 		return "", err
 	}
 	defer resp.Body.Close()
 
 	_, err = io.ReadAll(resp.Body)
 	if err != nil {
-		//	log.Fatal(err)
+		p.Logger.Error("error while reading data fron response body ", err)
 
 		return "", err
 	}
 
 	coockie := resp.Header.Get("Set-Cookie")
-
 	reg := regexp.MustCompile(`sid_EXTERNAL=(\d+)`)
 	if len(reg.FindStringSubmatch(coockie)) == 0 {
 
+		p.Logger.Error("lenght of cookie is equal zero")
 		return "", errors.New("wrong login or password")
 	}
 
 	sidValue := reg.FindStringSubmatch(coockie)
 	if len(sidValue) < 2 {
+		p.Logger.Error("sid values is less than 2")
 		return "", errors.New("empty sid value")
 	}
 	count, err := p.reqWithFilter(sidValue[1], path, fileName, mothly)
 	if err != nil {
+		p.Logger.Error("error while doing request with filter", err)
 		return "", err
 	}
 
@@ -81,7 +82,7 @@ func (p *Parser) reqWithFilter(sid, path, fileName string, monthly bool) (string
 
 	cyear, cmonth, cday := now.Date()
 	publishedTo = fmt.Sprintf("%d.%d.%d", cday, cmonth, cyear)
-
+	p.Logger.Info("getting results from ", publishedFrom, " to ", publishedTo)
 	req, err := http.NewRequest("GET", p.Client.BasePath, nil)
 
 	query := req.URL.Query()
@@ -94,7 +95,7 @@ func (p *Parser) reqWithFilter(sid, path, fileName string, monthly bool) (string
 
 	if err != nil {
 		//	log.Fatal(err)
-		fmt.Println("1")
+		p.Logger.Error("error while encoding raw querry ", err)
 		return "0", err
 	}
 
@@ -107,16 +108,14 @@ func (p *Parser) reqWithFilter(sid, path, fileName string, monthly bool) (string
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36")
 	resp, err := p.Client.Do(req)
 	if err != nil {
-		fmt.Println("2")
-		//	log.Fatal(err)
+		p.Logger.Error("error while doing request ", err)
 		return "0", err
 	}
 
 	defer resp.Body.Close()
 	bodyText, err := io.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println("3")
-		//	log.Fatal(err)
+		p.Logger.Error("error whiel reading resp body ", err)
 		return "0", err
 	}
 
@@ -128,6 +127,7 @@ func (p *Parser) reqWithFilter(sid, path, fileName string, monthly bool) (string
 		}
 		return matches[1], nil
 	} else {
+		p.Logger.Info("no new results on current account ")
 		return "0", nil
 	}
 
@@ -147,8 +147,7 @@ func (p *Parser) downloadXLS(sid, path, fileName, publishTo, publishFrom string)
 	req.URL.RawQuery = query.Encode()
 
 	if err != nil {
-		//	log.Fatal(err)
-		fmt.Println("1")
+		p.Logger.Error("error while encoding query ", err)
 		return err
 	}
 
@@ -161,39 +160,31 @@ func (p *Parser) downloadXLS(sid, path, fileName, publishTo, publishFrom string)
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36")
 	resp, err := p.Client.Do(req)
 	if err != nil {
+		p.Logger.Error("error while doing request ", err)
 		return err
-		// 	}
+
 	}
 
 	if err := os.MkdirAll(path, os.ModePerm); err != nil {
+		p.Logger.Error("error while creating directory on path ", path, "with error : ", err)
 		return err
 	}
 
-	// Create the file
 	out, err := os.Create(fmt.Sprintf("%s/%s", path, fileName))
 	if err != nil {
+		p.Logger.Error("error while creating file: ", fileName, "with error: ", err)
 		return nil
 	}
 	defer out.Close()
 
-	// Write the body to file
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
 
 		return nil
 	}
-
-	//fmt.Println(resp)
-	if err != nil {
-		fmt.Println("2")
-		//	log.Fatal(err)
-		return err
-	}
+	p.Logger.Info("success downloading  file ", fileName, " in ", path, " directory")
 
 	defer resp.Body.Close()
-	//bodyText, err := io.ReadAll(resp.Body)
 
-	//return string(bodyText), nil
-	fmt.Println("Download done")
 	return nil
 }

@@ -1,14 +1,14 @@
 package handlers
 
 import (
-	"restApi/internal/app/logging"
+	"github.com/sirupsen/logrus"
 )
 
 type Handlers struct {
-	logger logging.Logger
+	logger *logrus.Logger
 }
 
-func NewHandlers(logger logging.Logger) *Handlers {
+func NewHandlers(logger *logrus.Logger) *Handlers {
 	return &Handlers{
 
 		logger: logger,

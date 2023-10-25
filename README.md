@@ -1,4 +1,4 @@
-# REST API 
+# simple rzn parser
 
 fiber - swagger - logrus - gorm - testify - gomail
 

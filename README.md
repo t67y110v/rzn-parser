@@ -1,10 +1,9 @@
 # simple rzn parser
 
-fiber - swagger - logrus - gorm - testify - gomail
+fiber - swagger - logrus 
 
 ## Swagger documentaion on http://localhost:4000/swagger/index.html#/
 
-## Configuration setup
 
 #### configs/apiserver.toml
 
